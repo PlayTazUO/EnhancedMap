@@ -34,9 +34,8 @@ supported yet.
 
 ## TazUO integration
 
-The former TazUO plugin has been removed. EnhancedMap support is intended to be built
-directly into TazUO; see [`TazUO-EnhancedMap-Integration.md`](TazUO-EnhancedMap-Integration.md)
-for the protocol reference and a step-by-step implementation guide.
+TazUO supports the EnhancedMap protocol built in. The former external TazUO plugin has
+been removed.
 
 ## EnhancedMap server
 

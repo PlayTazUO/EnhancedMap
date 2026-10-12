@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.rid }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: macos-14
+            rid: osx-arm64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish desktop
+        run: dotnet publish src/EnhancedMap.Desktop/EnhancedMap.Desktop.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/desktop
+
+      - name: Publish server
+        run: dotnet publish EnhancedMapServerNetCore/EnhancedMapServerNetCore/EnhancedMapServerNetCore.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/server
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.rid }}
+          path: publish/desktop
+          compression-level: 0
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: server-${{ matrix.rid }}
+          path: publish/server
+          compression-level: 0
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Package zips
+        run: |
+          set -e
+          mkdir -p release
+          for dir in artifacts/*/; do
+            dir="${dir%/}"
+            name="$(basename "$dir")"
+            app="${name%%-*}"
+            rid="${name#*-}"
+            case "$app" in
+              desktop) appname="EnhancedMap-Desktop" ;;
+              server)  appname="EnhancedMapServer" ;;
+              *) echo "Unknown artifact: $name"; exit 1 ;;
+            esac
+            # Artifacts do not retain file mode bits, so restore the exec bit on the app hosts.
+            find "$dir" -type f \( -name 'EnhancedMap.Desktop' -o -name 'EnhancedMapServer' \) -exec chmod +x {} +
+            (cd "$dir" && zip -r -q "$GITHUB_WORKSPACE/release/${appname}-${rid}.zip" .)
+          done
+          ls -lh release
+
+      - name: Remove previous release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete latest --yes --cleanup-tag || true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          cat > notes.md <<'EOF'
+          Automated build of the EnhancedMap desktop and server.
+
+          Platforms:
+          - Windows (x64)
+          - Linux (x64)
+          - macOS (Apple Silicon / arm64)
+          EOF
+          printf '\nBuilt from commit `%s`.\n' "$GITHUB_SHA" >> notes.md
+          gh release create latest release/*.zip \
+            --target "$GITHUB_SHA" \
+            --title "EnhancedMap Latest" \
+            --latest \
+            --notes-file notes.md
