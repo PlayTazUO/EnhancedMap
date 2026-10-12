@@ -19,6 +19,7 @@ namespace EnhancedMapServerNetCore.Network
             Handlers.Add(0x23, ChatMsg);
             Handlers.Add(0x25, UserData);
             Handlers.Add(0x27, AlertAdvice);
+            Handlers.Add(0x2A, KeepAlive);
             Handlers.Add(0x2B, ProtocolRequest);
             Handlers.Add(0x31, SharedLabel);
         }
@@ -161,6 +162,11 @@ namespace EnhancedMapServerNetCore.Network
                 return;
             User user = UserManager.Get(client.Guid);
             user.SendToUsersInRoom(new PAlertAdvice(p.ReadUShort(), p.ReadUShort(), user.Name));
+        }
+
+        private static void KeepAlive(Session client, Packet p)
+        {
+            // Receiving any data already resets the session's inactivity timer; nothing else to do.
         }
 
         private static void ProtocolRequest(Session client, Packet p)

@@ -1,13 +1,112 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="EnhancedMap.Desktop.Windows.SettingsWindow"
-        Width="560" Height="520"
+        Width="800" Height="620"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Title="Settings">
-  <DockPanel Margin="8">
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
-      <Button Name="OkButton" Content="OK" Width="90" Click="OnOkClick" />
+  <Window.Background>
+    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#0F1218" Offset="0" />
+      <GradientStop Color="#1A1F2A" Offset="1" />
+    </LinearGradientBrush>
+  </Window.Background>
+
+  <Window.Resources>
+    <Color x:Key="SystemAccentColor">#E0A458</Color>
+    <SolidColorBrush x:Key="AccentBrush">#E0A458</SolidColorBrush>
+    <SolidColorBrush x:Key="AccentHoverBrush">#F0BB74</SolidColorBrush>
+    <SolidColorBrush x:Key="TextBrush">#E6E9EF</SolidColorBrush>
+    <SolidColorBrush x:Key="MutedTextBrush">#9AA3B2</SolidColorBrush>
+    <SolidColorBrush x:Key="FieldBrush">#1B202B</SolidColorBrush>
+    <SolidColorBrush x:Key="FieldBorderBrush">#39424F</SolidColorBrush>
+    <SolidColorBrush x:Key="SurfaceBrush">#20262F</SolidColorBrush>
+  </Window.Resources>
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style Selector="TabItem">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
+      <Setter Property="Padding" Value="16,7" />
+      <Setter Property="FontSize" Value="14" />
+    </Style>
+    <Style Selector="TabItem:selected">
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="TabItem:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource AccentHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="14,6" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2B333F" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#161B23" />
+    </Style>
+
+    <Style Selector="Button.accent">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="#171205" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}" />
+    </Style>
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#C98F49" />
+      <Setter Property="BorderBrush" Value="#C98F49" />
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
+      <Setter Property="Padding" Value="8,6" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+
+    <Style Selector="ComboBox">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
+    </Style>
+
+    <Style Selector="NumericUpDown">
+      <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <Style Selector="CheckBox, RadioButton">
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="12">
+    <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Width="4" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="Enhanced Map — Settings" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
+
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+      <Button Name="OkButton" Classes="accent" Content="OK" Width="90" Click="OnOkClick" />
     </StackPanel>
 
     <TabControl>
@@ -37,7 +136,7 @@
             <TextBlock Grid.Row="8" Grid.Column="0" Text="Reconnect delay (ms):" VerticalAlignment="Center" />
             <NumericUpDown Grid.Row="8" Grid.Column="1" Name="NumReconnect" Minimum="1000" Maximum="600000" Increment="1000" Width="140" HorizontalAlignment="Left" />
 
-            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" />
+            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Classes="accent" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" />
           </Grid>
         </ScrollViewer>
       </TabItem>
@@ -138,7 +237,7 @@
             </StackPanel>
             <TextBlock Name="ServerCommandDescription" TextWrapping="Wrap" Foreground="#AAAAAA" />
             <StackPanel Name="ServerArgsPanel" Spacing="6" />
-            <Button Name="ServerSendButton" Content="Send" Width="90" HorizontalAlignment="Left" Click="OnServerSendClick" />
+            <Button Name="ServerSendButton" Classes="accent" Content="Send" Width="90" HorizontalAlignment="Left" Click="OnServerSendClick" />
           </StackPanel>
           <TextBox Name="ServerOutputBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
                    ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -148,9 +247,10 @@
 
       <TabItem Header="About">
         <StackPanel Margin="16" Spacing="8">
-          <TextBlock Name="AboutVersion" FontSize="18" />
+          <TextBlock Name="AboutVersion" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
           <TextBlock Text="EnhancedMap - a free UO mapping tool." TextWrapping="Wrap" />
           <TextBlock Text="Cross-platform port: .NET 10 + Avalonia + SkiaSharp." TextWrapping="Wrap" />
+          <TextBlock Text="Converted to Dotnet 10 and modernized by TazmanianTad" TextWrapping="Wrap" />
         </StackPanel>
       </TabItem>
     </TabControl>

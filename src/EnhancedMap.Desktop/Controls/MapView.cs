@@ -116,11 +116,9 @@ namespace EnhancedMap.Desktop.Controls
 
             if (MouseManager.LeftIsPressed || pt.Properties.IsMiddleButtonPressed)
             {
-                if (Global.FreeView)
-                {
-                    Cursor = new Cursor(StandardCursorType.SizeAll);
-                    _lastScroll = pos;
-                }
+                _dragging = true;
+                Cursor = new Cursor(StandardCursorType.SizeAll);
+                _lastScroll = pos;
             }
         }
 
@@ -143,11 +141,11 @@ namespace EnhancedMap.Desktop.Controls
             bool leftDown = props.IsLeftButtonPressed;
             bool middleDown = props.IsMiddleButtonPressed;
 
-            if (middleDown && !Global.FreeView)
-                Global.FreeView = true;
-
-            if ((leftDown && Global.FreeView) || middleDown)
+            if (leftDown || middleDown)
             {
+                if (!Global.FreeView)
+                    Global.FreeView = true;
+
                 int x = (int) pos.X;
                 int y = (int) pos.Y;
 

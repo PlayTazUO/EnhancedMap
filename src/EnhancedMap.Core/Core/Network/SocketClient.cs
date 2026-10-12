@@ -17,6 +17,9 @@ namespace EnhancedMap.Core.Network
         private const int BUFFER_SIZE = 4096;
         private const int HEADER_SIZE = 3;
 
+        // The server drops sessions that are idle for ~1 minute; send a keep-alive well before that.
+        private const int KEEP_ALIVE_INTERVAL_MS = 30000;
+
         private static readonly BufferPool _pool = new BufferPool(10, BUFFER_SIZE);
 
         private readonly byte[] _headerBuffer = new byte[3];
@@ -32,6 +35,7 @@ namespace EnhancedMap.Core.Network
         private SocketAsyncEventArgs _sendEventArgs;
         private SendQueue _sendQueue;
         private DateTime _updateTime;
+        private DateTime _lastSend;
 
 
         public bool IsConnected => _clientSocket != null && _clientSocket.Connected;
@@ -76,6 +80,7 @@ namespace EnhancedMap.Core.Network
             AccessLevel = AccessLevel.Normal;
             Protocol = Protocol.Unknown;
             IsRunning = true;
+            _lastSend = DateTime.Now;
 
             InvokeWaiting();
 
@@ -126,6 +131,23 @@ namespace EnhancedMap.Core.Network
             HandleReceive();
 
             Flush();
+
+            KeepAlive();
+        }
+
+        /// <summary>
+        ///     Sends an empty packet when the connection has been idle so the server does not drop it
+        ///     for inactivity.
+        /// </summary>
+        private void KeepAlive()
+        {
+            if (!IsRunning || !CanSend || !IsConnected)
+                return;
+
+            if ((DateTime.Now - _lastSend).TotalMilliseconds < KEEP_ALIVE_INTERVAL_MS)
+                return;
+
+            Send(new PKeepAlive());
         }
 
         private void ProcessRecv(SocketAsyncEventArgs e)
@@ -323,6 +345,8 @@ namespace EnhancedMap.Core.Network
         {
             try
             {
+                _lastSend = DateTime.Now;
+
                 SendQueue.Gram buff = null;
 
                 lock (_send)

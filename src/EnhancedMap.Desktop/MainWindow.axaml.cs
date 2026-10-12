@@ -97,6 +97,7 @@ namespace EnhancedMap.Desktop
                 Global.Facet = Global.Maps.FirstOrDefault(s => s != null)?.Index ?? 0;
                 Global.FacetChanged += (s, args) => { UpdateMapsForFacet(); _requestRefresh = true; };
                 UpdateMapsForFacet();
+                CenterOnMap();
             }
             catch (Exception ex)
             {
@@ -125,11 +126,19 @@ namespace EnhancedMap.Desktop
 
             _timer.Start();
 
-            if (Global.SettingsCollection["autologin"].ToBool())
+            if (Global.SettingsCollection["autologin"].ToBool() || HasSavedConnectionSettings())
                 NetworkManager.Connect();
 
             if (Global.SettingsCollection["openchatatstart"].ToBool())
                 ChatWindow.Show(this);
+        }
+
+        private static bool HasSavedConnectionSettings()
+        {
+            var s = Global.SettingsCollection;
+            return !string.IsNullOrWhiteSpace(s["ip"]?.ToString())
+                   && !string.IsNullOrWhiteSpace(s["username"]?.ToString())
+                   && !string.IsNullOrWhiteSpace(s["password"]?.ToString());
         }
 
         private void OnClosing(object sender, WindowClosingEventArgs e)
@@ -202,6 +211,15 @@ namespace EnhancedMap.Desktop
                     Logger.Warn("Map image not found: " + path);
                 }
             }
+        }
+
+        private static void CenterOnMap()
+        {
+            if (Global.Facet < 0 || Global.Facet >= Global.Maps.Length || Global.Maps[Global.Facet] == null)
+                return;
+
+            Global.X = Global.Maps[Global.Facet].Width / 2f;
+            Global.Y = Global.Maps[Global.Facet].Height / 2f;
         }
 
         private void OnTimerTick(object sender, EventArgs e)
@@ -522,7 +540,7 @@ namespace EnhancedMap.Desktop
 
         private void OnAboutClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new MessageDialog("About", $"Enhanced Map {MainCore.MapVersion}\n.NET 10 + Avalonia + SkiaSharp");
+            var dialog = new MessageDialog("About", $"Enhanced Map {MainCore.MapVersion}\n.NET 10 + Avalonia + SkiaSharp\nConverted to Dotnet 10 and modernized by TazmanianTad");
             dialog.Show(this);
         }
     }

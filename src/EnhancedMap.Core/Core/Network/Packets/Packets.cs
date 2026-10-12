@@ -42,6 +42,17 @@ namespace EnhancedMap.Core.Network
         }
     }
 
+    /// <summary>
+    ///     Empty packet sent periodically to keep the session alive. The server resets its
+    ///     inactivity timer on any received data, so no server-side handling is required.
+    /// </summary>
+    public sealed class PKeepAlive : PacketWriter
+    {
+        public PKeepAlive() : base(0x2A)
+        {
+        }
+    }
+
     public sealed class PLoginRequest : PacketWriter
     {
         public PLoginRequest(string username, string password) : base(0x1F)
