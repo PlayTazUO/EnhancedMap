@@ -6,7 +6,7 @@ namespace EnhancedMapServerNetCore.Cryptography
 {
     public static class SHA1
     {
-        private static readonly SHA1CryptoServiceProvider _provider = new SHA1CryptoServiceProvider();
+        private static readonly System.Security.Cryptography.SHA1 _provider = System.Security.Cryptography.SHA1.Create();
         private static readonly byte[] _buffer = new byte[256];
 
         public static string Protect(string input)

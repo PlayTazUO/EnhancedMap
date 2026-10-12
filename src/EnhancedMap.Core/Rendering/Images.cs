@@ -56,14 +56,14 @@ namespace EnhancedMap.Drawing
             Bitmap = null;
         }
 
-        public static Image FromFile(string path)
+        public static Bitmap FromFile(string path)
         {
-            return new Image {Bitmap = SKBitmap.Decode(path)};
+            return new Bitmap(SKBitmap.Decode(path));
         }
 
-        public static Image FromStream(Stream stream)
+        public static Bitmap FromStream(Stream stream)
         {
-            return new Image {Bitmap = SKBitmap.Decode(stream)};
+            return new Bitmap(SKBitmap.Decode(stream));
         }
     }
 
@@ -82,6 +82,11 @@ namespace EnhancedMap.Drawing
         public Bitmap(Image source)
         {
             Bitmap = source.Bitmap?.Copy() ?? new SKBitmap(1, 1);
+        }
+
+        internal Bitmap(SKBitmap source)
+        {
+            Bitmap = source ?? new SKBitmap(1, 1);
         }
 
         public Bitmap(Image source, int width, int height)

@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /EnhancedMapServerNetCore/build.bat
+.DS_Store

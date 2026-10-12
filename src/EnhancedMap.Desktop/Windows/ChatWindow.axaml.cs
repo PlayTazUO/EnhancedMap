@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using EnhancedMap.Core;
@@ -19,6 +20,8 @@ namespace EnhancedMap.Desktop.Windows
             InitializeComponent();
 
             ChatManager.MessageWrited += OnMessageWrited;
+
+            InputBox.AddHandler(KeyDownEvent, OnInputKeyDown, RoutingStrategies.Tunnel);
 
             InputBox.IsEnabled = false;
 

@@ -2,6 +2,8 @@
   <Folder Name="/src/">
     <Project Path="src/EnhancedMap.Core/EnhancedMap.Core.csproj" />
     <Project Path="src/EnhancedMap.Desktop/EnhancedMap.Desktop.csproj" />
-    <Project Path="src/EnhancedMap.TazUO/EnhancedMap.TazUO.csproj" />
+  </Folder>
+  <Folder Name="/server/">
+    <Project Path="EnhancedMapServerNetCore/EnhancedMapServerNetCore/EnhancedMapServerNetCore.csproj" />
   </Folder>
 </Solution>

@@ -8,8 +8,7 @@
   <DockPanel>
     <TextBox Name="InputBox" DockPanel.Dock="Bottom"
              Margin="4" AcceptsReturn="True" MaxLength="100"
-             Watermark="Type a message..."
-             KeyDown="OnInputKeyDown" />
+             Watermark="Type a message..." />
     <ScrollViewer Name="Scroller" VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
       <StackPanel Name="Messages" Margin="4" />

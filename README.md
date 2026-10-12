@@ -9,8 +9,7 @@ cross-platform **Avalonia** UI and **SkiaSharp** rendering (replacing the origin
 | --- | --- |
 | `src/EnhancedMap.Core` | Platform-independent core: networking/protocol, settings, map model, and the SkiaSharp map renderer/generator. |
 | `src/EnhancedMap.Desktop` | Cross-platform Avalonia desktop app (main map window, chat, settings, Map Maker, tools). Runs standalone. |
-| `src/EnhancedMap.TazUO` | TazUO plugin that forwards live player data to an EnhancedMap server. |
-| `EnhancedMapServerNetCore` | The server that EnhancedMap clients and the TazUO plugin connect to. |
+| `EnhancedMapServerNetCore` | The server that EnhancedMap clients connect to. |
 
 ## Build & run
 
@@ -33,12 +32,11 @@ Maps are produced from the UO client directory (`radarcol.mul`, `mapN.mul` / `ma
 `staidxN.mul`, `staticsN.mul`) and written to `Maps/` as PNGs. DDS (`facet0N.dds`) sources are not
 supported yet.
 
-## TazUO plugin
+## TazUO integration
 
-Build `src/EnhancedMap.TazUO` and copy `EnhancedMap.TazUO.dll` into the client's `Data/Plugins`
-folder, then enable it in TazUO's plugin list. On first in-game login it asks for the EnhancedMap
-server address and port using the client's Unicode prompt and saves them to `EnhancedMapBridge.json`
-next to the plugin.
+The former TazUO plugin has been removed. EnhancedMap support is intended to be built
+directly into TazUO; see [`TazUO-EnhancedMap-Integration.md`](TazUO-EnhancedMap-Integration.md)
+for the protocol reference and a step-by-step implementation guide.
 
 ## EnhancedMap server
 

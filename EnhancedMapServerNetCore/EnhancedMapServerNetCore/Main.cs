@@ -120,6 +120,8 @@ namespace EnhancedMapServerNetCore
             if (RoomManager.Get("General") == null)
                 RoomManager.Add(new Room("General", "general"));
 
+            SetupManager.Setup();
+
 
             using (Server = new Server(SettingsManager.Configuration))
             {
