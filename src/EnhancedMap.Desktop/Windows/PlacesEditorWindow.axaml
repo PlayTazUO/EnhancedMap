@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EnhancedMap.Desktop.Windows.PlacesEditorWindow"
+        Width="360" Height="300"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Places Editor">
+  <StackPanel Margin="12" Spacing="8">
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock Text="X:" VerticalAlignment="Center" Width="40" />
+      <TextBox Name="TextX" Width="100" />
+      <TextBlock Text="Y:" VerticalAlignment="Center" Width="20" />
+      <TextBox Name="TextY" Width="100" />
+    </StackPanel>
+    <TextBlock Text="Description:" />
+    <TextBox Name="DescriptionBox" />
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock Text="Category:" VerticalAlignment="Center" Width="70" />
+      <ComboBox Name="CategoryCombo" Width="200" SelectionChanged="OnCategoryChanged" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock Text="Facet:" VerticalAlignment="Center" Width="70" />
+      <ComboBox Name="FacetCombo" Width="200" />
+    </StackPanel>
+    <CheckBox Name="ShowNameCheck" Content="Always show name" />
+    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+      <Button Name="AddButton" Content="Add" Width="80" Click="OnAddClick" />
+      <Button Name="CancelButton" Content="Cancel" Width="80" Click="OnCancelClick" />
+    </StackPanel>
+  </StackPanel>
+</Window>

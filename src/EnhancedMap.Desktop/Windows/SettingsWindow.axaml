@@ -1,0 +1,155 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EnhancedMap.Desktop.Windows.SettingsWindow"
+        Width="560" Height="520"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Settings">
+  <DockPanel Margin="8">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+      <Button Name="OkButton" Content="OK" Width="90" Click="OnOkClick" />
+    </StackPanel>
+
+    <TabControl>
+      <TabItem Header="Network">
+        <ScrollViewer>
+          <Grid Margin="8" ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Username:" VerticalAlignment="Center" />
+            <TextBox Grid.Row="0" Grid.Column="1" Name="TextName" MaxLength="16" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Name="TextPassword" PasswordChar="*" MaxLength="16" />
+
+            <CheckBox Grid.Row="2" Grid.Column="1" Name="CheckRememberCredentials" Content="Remember credentials" />
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Server IP:" VerticalAlignment="Center" />
+            <TextBox Grid.Row="3" Grid.Column="1" Name="TextIp" />
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Server port:" VerticalAlignment="Center" />
+            <TextBox Grid.Row="4" Grid.Column="1" Name="TextPort" Width="120" HorizontalAlignment="Left" />
+
+            <CheckBox Grid.Row="5" Grid.Column="1" Name="CheckRememberServer" Content="Remember server" />
+
+            <CheckBox Grid.Row="6" Grid.Column="1" Name="CheckAutoLogin" Content="Auto login at start" />
+
+            <CheckBox Grid.Row="7" Grid.Column="1" Name="CheckTryReconnect" Content="Try to reconnect" />
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Reconnect delay (ms):" VerticalAlignment="Center" />
+            <NumericUpDown Grid.Row="8" Grid.Column="1" Name="NumReconnect" Minimum="1000" Maximum="600000" Increment="1000" Width="140" HorizontalAlignment="Left" />
+
+            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" />
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="General">
+        <ScrollViewer>
+          <WrapPanel Margin="8" Orientation="Horizontal" ItemWidth="250">
+            <CheckBox Name="CheckShowHits" Content="Show hits bar" />
+            <CheckBox Name="CheckShowStamina" Content="Show stamina bar" />
+            <CheckBox Name="CheckShowMana" Content="Show mana bar" />
+            <CheckBox Name="CheckCenterPlayer" Content="Center on player" />
+            <CheckBox Name="CheckTrackDeathPoint" Content="Track death points" />
+            <CheckBox Name="CheckShowHiddenIcon" Content="Show hidden icon" />
+            <CheckBox Name="CheckShowDeathIcon" Content="Show death icon" />
+            <CheckBox Name="CheckAbbreviateNames" Content="Abbreviate names" />
+            <CheckBox Name="CheckPanicSounds" Content="Panic sounds" />
+            <CheckBox Name="CheckAlertSounds" Content="Alert sounds" />
+            <CheckBox Name="CheckSmartNamePosition" Content="Smart names position" />
+            <CheckBox Name="CheckShowPlacesIcons" Content="Show places icons" />
+            <CheckBox Name="CheckHideLessImportantPlaces" Content="Hide less important places" />
+            <CheckBox Name="CheckShowTownsNames" Content="Show towns names" />
+            <CheckBox Name="CheckShowServerBounds" Content="Show server bounds" />
+            <CheckBox Name="CheckShowGuardlines" Content="Show guard lines" />
+            <CheckBox Name="CheckShowCoordinates" Content="Show coordinates" />
+            <CheckBox Name="CheckShowHouses" Content="Show houses" />
+            <CheckBox Name="CheckShowMobilesAround" Content="Show mobiles around you" />
+            <CheckBox Name="CheckDontRenderUsersDiffFacet" Content="Don't render users on other facets" />
+          </WrapPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Application">
+        <ScrollViewer>
+          <StackPanel Margin="8" Spacing="6">
+            <TextBlock Text="Client type:" />
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <RadioButton Name="RadioClassic" Content="Classic" GroupName="client" />
+              <RadioButton Name="RadioEnhanced" Content="Enhanced" GroupName="client" />
+              <RadioButton Name="RadioOrion" Content="Orion" GroupName="client" />
+            </StackPanel>
+            <CheckBox Name="CheckShowScrollbars" Content="Show scrollbars" />
+            <CheckBox Name="CheckOpenChatAtStart" Content="Open chat at start" />
+            <CheckBox Name="CheckShowIncomingMsg" Content="Show incoming messages" />
+            <CheckBox Name="CheckSoundsIncomingMsg" Content="Sounds on incoming messages" />
+            <CheckBox Name="CheckLoadMapsOnDemand" Content="Load maps on demand" />
+            <CheckBox Name="CheckShowFps" Content="Show FPS" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="FPS:" VerticalAlignment="Center" />
+              <NumericUpDown Name="NumFps" Minimum="1" Maximum="120" Width="120" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Chat font size:" VerticalAlignment="Center" />
+              <NumericUpDown Name="NumChatFontSize" Minimum="6" Maximum="48" Width="120" />
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="Diagnostic">
+        <DockPanel Margin="8">
+          <Button DockPanel.Dock="Top" Name="SaveLogButton" Content="Save log" Width="90" HorizontalAlignment="Left" Margin="0,0,0,6" Click="OnSaveLogClick" />
+          <CheckBox DockPanel.Dock="Top" Name="CheckAutoScroll" Content="Auto scroll" Margin="0,0,0,6" />
+          <ScrollViewer Name="LogScroller" VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="LogPanel" />
+          </ScrollViewer>
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="Labels">
+        <DockPanel Margin="8">
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
+            <Button Content="Enable all" Click="OnLabelsEnableAll" />
+            <Button Content="Disable all" Click="OnLabelsDisableAll" />
+            <Button Content="Show names" Click="OnLabelsShowNames" />
+            <Button Content="Hide names" Click="OnLabelsHideNames" />
+            <Button Content="Refresh" Click="OnLabelsRefresh" />
+          </StackPanel>
+          <Grid ColumnDefinitions="260,*">
+            <ScrollViewer Grid.Column="0">
+              <StackPanel Name="LabelsSetsPanel" />
+            </ScrollViewer>
+            <ScrollViewer Grid.Column="1">
+              <StackPanel Name="LabelsEntriesPanel" />
+            </ScrollViewer>
+          </Grid>
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="Server Commands">
+        <DockPanel Margin="8">
+          <StackPanel DockPanel.Dock="Top" Spacing="8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Command:" VerticalAlignment="Center" />
+              <ComboBox Name="ServerCommandCombo" Width="200" SelectionChanged="OnServerCommandChanged" />
+            </StackPanel>
+            <TextBlock Name="ServerCommandDescription" TextWrapping="Wrap" Foreground="#AAAAAA" />
+            <StackPanel Name="ServerArgsPanel" Spacing="6" />
+            <Button Name="ServerSendButton" Content="Send" Width="90" HorizontalAlignment="Left" Click="OnServerSendClick" />
+          </StackPanel>
+          <TextBox Name="ServerOutputBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="0,8,0,0" />
+        </DockPanel>
+      </TabItem>
+
+      <TabItem Header="About">
+        <StackPanel Margin="16" Spacing="8">
+          <TextBlock Name="AboutVersion" FontSize="18" />
+          <TextBlock Text="EnhancedMap - a free UO mapping tool." TextWrapping="Wrap" />
+          <TextBlock Text="Cross-platform port: .NET 10 + Avalonia + SkiaSharp." TextWrapping="Wrap" />
+        </StackPanel>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

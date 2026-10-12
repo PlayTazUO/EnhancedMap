@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EnhancedMap.Desktop.Windows.MapMakerWindow"
+        Width="560" Height="520"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Map Maker">
+  <Grid Margin="12">
+    <StackPanel Name="KindPanel" Spacing="12" VerticalAlignment="Top">
+      <TextBlock Text="Map Maker" FontSize="20" />
+      <TextBlock Text="Choose the map source:" />
+      <Button Content="Original Maps" Height="64" HorizontalAlignment="Stretch" Click="OnOriginalClick" />
+      <Button Content="Custom Maps" Height="64" HorizontalAlignment="Stretch" Click="OnCustomClick" />
+    </StackPanel>
+
+    <StackPanel Name="OriginalPanel" Spacing="10" VerticalAlignment="Top" IsVisible="False">
+      <TextBlock Text="Original Maps" FontSize="20" />
+      <Button Content="Download pre-built maps" Height="48" HorizontalAlignment="Stretch" Click="OnDownloadClick" />
+      <Button Content="Generate from UO client data" Height="48" HorizontalAlignment="Stretch" Click="OnGenerateOriginalClick" />
+      <Button Content="Back" Width="90" HorizontalAlignment="Right" Click="OnBackClick" />
+    </StackPanel>
+
+    <StackPanel Name="CustomPanel" Spacing="8" IsVisible="False">
+      <TextBlock Text="Custom Maps" FontSize="20" />
+      <Grid ColumnDefinitions="90,*,90,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="6">
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Index:" VerticalAlignment="Center" />
+        <NumericUpDown Grid.Row="0" Grid.Column="1" Name="IndexBox" Minimum="0" Maximum="5" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="Name:" VerticalAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="3" Name="NameBox" />
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Width:" VerticalAlignment="Center" />
+        <NumericUpDown Grid.Row="1" Grid.Column="1" Name="WidthBox" Minimum="0" Maximum="16384" Increment="8" />
+        <TextBlock Grid.Row="1" Grid.Column="2" Text="Height:" VerticalAlignment="Center" />
+        <NumericUpDown Grid.Row="1" Grid.Column="3" Name="HeightBox" Minimum="0" Maximum="16384" Increment="8" />
+      </Grid>
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Add" Width="90" Click="OnAddCustomClick" />
+        <Button Content="Remove" Width="90" Click="OnRemoveCustomClick" />
+      </StackPanel>
+      <ListBox Name="CustomList" Height="200" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="Generate" Width="110" Click="OnGenerateCustomClick" />
+        <Button Content="Back" Width="90" Click="OnBackClick" />
+      </StackPanel>
+    </StackPanel>
+
+    <DockPanel Name="ProgressPanel" IsVisible="False">
+      <TextBlock DockPanel.Dock="Top" Name="ProgressTitle" Text="Generating maps..." FontSize="18" Margin="0,0,0,8" />
+      <Button DockPanel.Dock="Bottom" Name="CloseButton" Content="Close" Width="90" HorizontalAlignment="Right" Margin="0,8,0,0" IsEnabled="False" Click="OnCloseClick" />
+      <TextBox Name="ProgressBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+               ScrollViewer.VerticalScrollBarVisibility="Auto"
+               ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+    </DockPanel>
+  </Grid>
+</Window>

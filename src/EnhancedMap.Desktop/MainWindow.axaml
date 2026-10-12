@@ -1,0 +1,46 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:EnhancedMap.Desktop.Controls"
+        x:Class="EnhancedMap.Desktop.MainWindow"
+        Title="Enhanced Map"
+        Width="900" Height="600"
+        MinWidth="250" MinHeight="150"
+        Background="Black">
+  <DockPanel>
+    <Menu DockPanel.Dock="Top" Name="MainMenu">
+      <MenuItem Header="_Map">
+        <MenuItem Header="_Connect" Name="ConnectMenuItem" Click="OnConnectClick" />
+        <MenuItem Header="Map _Maker..." Click="OnMapMakerClick" />
+        <MenuItem Header="_Flip view" Name="FlipMenuItem" Click="OnFlipClick" />
+        <Separator />
+        <MenuItem Header="E_xit" Click="OnExitClick" />
+      </MenuItem>
+      <MenuItem Header="_View">
+        <MenuItem Header="_Free view" Name="FreeViewMenuItem" Click="OnFreeViewClick" />
+        <MenuItem Header="Zoom _in" Click="OnZoomInClick" />
+        <MenuItem Header="Zoom _out" Click="OnZoomOutClick" />
+      </MenuItem>
+      <MenuItem Header="_Tools">
+        <MenuItem Header="_Places editor" Click="OnPlacesEditorClick" />
+        <MenuItem Header="_Search..." Click="OnSearchClick" />
+        <MenuItem Header="_Coords converter" Click="OnCoordsConverterClick" />
+      </MenuItem>
+      <MenuItem Header="_Windows">
+        <MenuItem Header="_Chat" Click="OnChatClick" />
+        <MenuItem Header="_Settings" Click="OnSettingsClick" />
+      </MenuItem>
+      <MenuItem Header="_Help">
+        <MenuItem Header="_About" Click="OnAboutClick" />
+      </MenuItem>
+    </Menu>
+
+    <Border DockPanel.Dock="Bottom" Background="#1A1A1A" Padding="6,3">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <TextBlock Grid.Column="0" Name="StatusText" Foreground="#DDDDDD" Text="Offline" />
+        <TextBlock Grid.Column="2" Name="CoordsText" Foreground="#DDDDDD" Text="(0, 0)" />
+      </Grid>
+    </Border>
+
+    <controls:MapView Name="Map" />
+  </DockPanel>
+</Window>

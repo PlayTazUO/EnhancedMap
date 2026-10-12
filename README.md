@@ -1,20 +1,48 @@
-# Download
-[Latest EnhancedMap](https://github.com/andreakarasho/EnhancedMap/releases/tag/1.0.0.0)
+# EnhancedMap
 
+A free Ultima Online mapping tool. This repository has been ported to **.NET 10** with a
+cross-platform **Avalonia** UI and **SkiaSharp** rendering (replacing the original WinForms/GDI+).
 
-# How can i compile EnhancedMapServer for my server machine?
-1. Install .NET Core 2.1:
+## Projects
 
-   - Windows: https://www.microsoft.com/net/download/windows
-   - Linux: https://www.microsoft.com/net/download/linux
-   - macOS: https://www.microsoft.com/net/download/macos
-   
- 2. Open CMD and write ([here](https://github.com/dotnet/docs/blob/master/docs/core/rid-catalog.md) you can see all platforms available. Here im compiling for a Windows 10 x64 machine): 
-   ```
-   cd "{ENHANCEDMAPSERVERNETCORE_FOLDER}"
-   dotnet publish -c Release -r win10-x64
-   ```
-   
- 3. Navigate to "ENHANCEDMAPSERVERNETCORE_FOLDER/bin/Release/netcoreapp2.1/{YOUR_PLATFORM}/publish/"
- 
- 4. Run EnhancedMapServerNetCore.exe (if you are using windows, instead use terminal for linux/macos)
+| Project | Description |
+| --- | --- |
+| `src/EnhancedMap.Core` | Platform-independent core: networking/protocol, settings, map model, and the SkiaSharp map renderer/generator. |
+| `src/EnhancedMap.Desktop` | Cross-platform Avalonia desktop app (main map window, chat, settings, Map Maker, tools). Runs standalone. |
+| `src/EnhancedMap.TazUO` | TazUO plugin that forwards live player data to an EnhancedMap server. |
+| `EnhancedMapServerNetCore` | The server that EnhancedMap clients and the TazUO plugin connect to. |
+
+## Build & run
+
+Requires the .NET 10 SDK.
+
+```sh
+# build everything
+dotnet build EnhancedMap.slnx
+
+# run the desktop app
+dotnet run --project src/EnhancedMap.Desktop
+```
+
+On first run (with no maps present) the Map Maker opens so you can generate maps from your
+Ultima Online client data (MUL / `mapNLegacyMUL.uop`) or download a prebuilt set.
+
+## Map generation
+
+Maps are produced from the UO client directory (`radarcol.mul`, `mapN.mul` / `mapNLegacyMUL.uop`,
+`staidxN.mul`, `staticsN.mul`) and written to `Maps/` as PNGs. DDS (`facet0N.dds`) sources are not
+supported yet.
+
+## TazUO plugin
+
+Build `src/EnhancedMap.TazUO` and copy `EnhancedMap.TazUO.dll` into the client's `Data/Plugins`
+folder, then enable it in TazUO's plugin list. On first in-game login it asks for the EnhancedMap
+server address and port using the client's Unicode prompt and saves them to `EnhancedMapBridge.json`
+next to the plugin.
+
+## EnhancedMap server
+
+```sh
+cd EnhancedMapServerNetCore
+dotnet publish -c Release
+```

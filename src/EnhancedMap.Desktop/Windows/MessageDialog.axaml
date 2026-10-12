@@ -1,0 +1,17 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EnhancedMap.Desktop.Windows.MessageDialog"
+        Width="600" Height="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False" ShowInTaskbar="False"
+        Title="Message">
+  <DockPanel Margin="8">
+    <Button Name="OkayButton" DockPanel.Dock="Bottom"
+            Content="OK" Width="80" HorizontalAlignment="Right" Margin="0,8,0,0"
+            Click="OnOkayClick" />
+    <TextBox Name="MessageBox" IsReadOnly="True" AcceptsReturn="True"
+             TextWrapping="NoWrap"
+             ScrollViewer.VerticalScrollBarVisibility="Auto"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+  </DockPanel>
+</Window>
