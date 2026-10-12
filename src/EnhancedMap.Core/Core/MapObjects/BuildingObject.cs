@@ -184,13 +184,19 @@ namespace EnhancedMap.Core.MapObjects
             {
                 int delta = Math.Max(canvasW, canvasH) * 2;
 
-                int aa = (int) Global.X - canvasW / 2;
-                int bb = (int) Global.Y - canvasH / 2;
+                if (Utility.Distance(Entry.Location.X, Entry.Location.Y, (int) Global.X, (int) Global.Y) < delta / Global.Zoom)
+                {
+                    int bx = (int) ((Entry.Location.X - Global.X) * Global.Zoom);
+                    int by = (int) ((Entry.Location.Y - Global.Y) * Global.Zoom);
+                    int bw = (int) (Entry.Size.Width * Global.Zoom);
+                    int bh = (int) (Entry.Size.Height * Global.Zoom);
 
-                int bx = (int) ((Entry.Location.X - aa - canvasW / 2) / (1f / Global.Zoom));
-                int by = (int) ((Entry.Location.Y - bb - canvasH / 2) / (1f / Global.Zoom));
-
-                if (Utility.Distance(Entry.Location.X, Entry.Location.Y, (int) Global.X, (int) Global.Y) < delta / Global.Zoom) g.DrawRectangle(Pens.Green, bx, by, Entry.Size.Width * Global.Zoom, Entry.Size.Height * Global.Zoom);
+                    g.Save();
+                    g.TranslateTransform(canvasW / 2f, canvasH / 2f);
+                    g.RotateTransform(Global.Angle);
+                    g.DrawRectangle(Pens.Green, bx, by, bw, bh);
+                    g.Restore();
+                }
             }
 
             return false;
