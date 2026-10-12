@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -54,6 +55,28 @@ namespace EnhancedMap.Desktop.Windows
             ApplyToCollection();
         }
 
+        /// <summary>
+        ///     Brings the settings window to the front on the Network tab and shows a
+        ///     connection error message.
+        /// </summary>
+        public void ShowConnectionError(Window owner, string message)
+        {
+            ClearConnectionError();
+            ConnectionErrorText.Text = message;
+            ConnectionErrorText.IsVisible = true;
+            Tabs.SelectedItem = NetworkTab;
+
+            if (!IsVisible)
+                Show(owner);
+
+            Activate();
+        }
+
+        public void ClearConnectionError()
+        {
+            ConnectionErrorText.IsVisible = false;
+        }
+
         // ---------------------------------------------------------------- load
 
         public void LoadSettings()
@@ -88,7 +111,7 @@ namespace EnhancedMap.Desktop.Windows
                     CheckRememberServer.IsChecked = GetBool(network, "rememberserver");
                     CheckAutoLogin.IsChecked = GetBool(network, "autologin");
                     CheckTryReconnect.IsChecked = GetBool(network, "tryreconnect");
-                    NumReconnect.Value = GetInt(network, "tryreconnecttime");
+                    TextReconnect.Text = GetInt(network, "tryreconnecttime").ToString();
                 }
 
                 XmlElement general = root["general"];
@@ -119,10 +142,6 @@ namespace EnhancedMap.Desktop.Windows
                 XmlElement application = root["application"];
                 if (application != null)
                 {
-                    int clienttype = GetInt(application, "clienttype");
-                    RadioClassic.IsChecked = clienttype == 0;
-                    RadioEnhanced.IsChecked = clienttype == 1;
-                    RadioOrion.IsChecked = clienttype == 2;
                     CheckShowScrollbars.IsChecked = GetBool(application, "showscrollbarls");
                     CheckOpenChatAtStart.IsChecked = GetBool(application, "openchatatstart");
                     CheckShowIncomingMsg.IsChecked = GetBool(application, "showincomingmsg");
@@ -211,7 +230,7 @@ namespace EnhancedMap.Desktop.Windows
             CheckRememberServer.IsChecked = s["rememberserver"].ToBool();
             CheckAutoLogin.IsChecked = s["autologin"].ToBool();
             CheckTryReconnect.IsChecked = s["tryreconnect"].ToBool();
-            NumReconnect.Value = s["tryreconnecttime"].ToInt();
+            TextReconnect.Text = s["tryreconnecttime"].ToInt().ToString();
 
             CheckShowHits.IsChecked = s["showhits"].ToBool();
             CheckShowStamina.IsChecked = s["showstamina"].ToBool();
@@ -233,9 +252,6 @@ namespace EnhancedMap.Desktop.Windows
             CheckShowMobilesAround.IsChecked = s["showmobilesaroundyou"].ToBool();
             CheckDontRenderUsersDiffFacet.IsChecked = s["dontrenderusersindifferentfacets"].ToBool();
 
-            RadioClassic.IsChecked = s["clienttype"].ToInt() == 0;
-            RadioEnhanced.IsChecked = s["clienttype"].ToInt() == 1;
-            RadioOrion.IsChecked = s["clienttype"].ToInt() == 2;
             CheckShowScrollbars.IsChecked = s["showscrollbarls"].ToBool();
             CheckOpenChatAtStart.IsChecked = s["openchatatstart"].ToBool();
             CheckShowIncomingMsg.IsChecked = s["showincomingmsg"].ToBool();
@@ -268,7 +284,7 @@ namespace EnhancedMap.Desktop.Windows
                 xml.WriteAttributeString("rememberserver", (CheckRememberServer.IsChecked == true).ToString());
                 xml.WriteAttributeString("autologin", (CheckAutoLogin.IsChecked == true).ToString());
                 xml.WriteAttributeString("tryreconnect", (CheckTryReconnect.IsChecked == true).ToString());
-                xml.WriteAttributeString("tryreconnecttime", ((int) (NumReconnect.Value ?? 30000)).ToString());
+                xml.WriteAttributeString("tryreconnecttime", ReconnectDelay().ToString());
                 xml.WriteEndElement();
 
                 xml.WriteStartElement("general");
@@ -295,8 +311,6 @@ namespace EnhancedMap.Desktop.Windows
                 xml.WriteEndElement();
 
                 xml.WriteStartElement("application");
-                int clienttype = RadioEnhanced.IsChecked == true ? 1 : RadioOrion.IsChecked == true ? 2 : 0;
-                xml.WriteAttributeString("clienttype", clienttype.ToString());
                 WriteCheck(xml, "showscrollbarls", CheckShowScrollbars);
                 WriteCheck(xml, "openchatatstart", CheckOpenChatAtStart);
                 WriteCheck(xml, "showincomingmsg", CheckShowIncomingMsg);
@@ -329,7 +343,7 @@ namespace EnhancedMap.Desktop.Windows
             s["rememberserver"] = CheckRememberServer.IsChecked == true;
             s["autologin"] = CheckAutoLogin.IsChecked == true;
             s["tryreconnect"] = CheckTryReconnect.IsChecked == true;
-            s["tryreconnecttime"] = (int) (NumReconnect.Value ?? 30000);
+            s["tryreconnecttime"] = ReconnectDelay();
 
             s["showhits"] = CheckShowHits.IsChecked == true;
             s["showstamina"] = CheckShowStamina.IsChecked == true;
@@ -351,7 +365,6 @@ namespace EnhancedMap.Desktop.Windows
             s["showmobilesaroundyou"] = CheckShowMobilesAround.IsChecked == true;
             s["dontrenderusersindifferentfacets"] = CheckDontRenderUsersDiffFacet.IsChecked == true;
 
-            s["clienttype"] = RadioEnhanced.IsChecked == true ? 1 : RadioOrion.IsChecked == true ? 2 : 0;
             s["showscrollbarls"] = CheckShowScrollbars.IsChecked == true;
             s["openchatatstart"] = CheckOpenChatAtStart.IsChecked == true;
             s["showincomingmsg"] = CheckShowIncomingMsg.IsChecked == true;
@@ -361,6 +374,11 @@ namespace EnhancedMap.Desktop.Windows
             s["fps"] = (int) (NumFps.Value ?? 30);
             s["chatfontsize"] = (int) (NumChatFontSize.Value ?? 10);
             s["autoscroll"] = CheckAutoScroll.IsChecked == true;
+        }
+
+        private int ReconnectDelay()
+        {
+            return int.TryParse(TextReconnect.Text, out int value) && value > 0 ? value : 30000;
         }
 
         private static void WriteCheck(XmlWriter xml, string name, CheckBox box)
@@ -378,6 +396,8 @@ namespace EnhancedMap.Desktop.Windows
 
         private void OnConnectClick(object sender, RoutedEventArgs e)
         {
+            ClearConnectionError();
+
             if (NetworkManager.SocketClient.IsConnected || NetworkManager.SocketClient.Status == ConnectionStatus.Waiting)
             {
                 NetworkManager.Disconnect(false);
@@ -385,7 +405,11 @@ namespace EnhancedMap.Desktop.Windows
             else
             {
                 ApplyToCollection();
-                NetworkManager.Connect();
+                if (!NetworkManager.Connect())
+                {
+                    ConnectionErrorText.Text = "Failed to connect. Check the server address, port and credentials.";
+                    ConnectionErrorText.IsVisible = true;
+                }
             }
         }
 
@@ -533,155 +557,433 @@ namespace EnhancedMap.Desktop.Windows
 
         // ---------------------------------------------------------------- server commands tab
 
-        private static readonly string[] ServerCommands =
+        private enum ServerArgKind
         {
-            "adduser", "addroom", "removeuser", "removeroom", "setroom", "kick", "ban", "enableuser",
-            "setpassword", "allusersonline", "userinfo", "sendmsg", "setprivileges", "allrooms", "statistics", "allusersinroom"
+            Text,
+            Password,
+            Combo
+        }
+
+        private sealed class ServerArg
+        {
+            public string Label;
+            public bool Required;
+            public string Watermark;
+            public ServerArgKind Kind = ServerArgKind.Text;
+            public string[] Options;
+        }
+
+        private sealed class ServerCommand
+        {
+            public string Name;
+            public string Category;
+            public string Description;
+            public string Usage;
+            public AccessLevel Required;
+            public ServerArg[] Args = Array.Empty<ServerArg>();
+        }
+
+        private sealed class ServerArgField
+        {
+            public ServerArg Arg;
+            public TextBox Text;
+            public ComboBox Combo;
+        }
+
+        private static readonly string[] PrivilegeOptions = {"Normal", "Room admin", "Server admin"};
+        private static readonly string[] LoginSystemOptions = {"Username + password", "Password only"};
+
+        private static readonly ServerCommand[] ServerCommands =
+        {
+            // ---- Users
+            new ServerCommand
+            {
+                Name = "adduser", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Create a new account.",
+                Usage = "adduser <username> <password> <room> <privileges>",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Username", Required = true, Watermark = "up to 16 characters"},
+                    new ServerArg {Label = "Password", Required = true, Kind = ServerArgKind.Password, Watermark = "up to 16 characters"},
+                    new ServerArg {Label = "Room", Required = true, Watermark = "an existing room name"},
+                    new ServerArg {Label = "Privileges", Required = true, Kind = ServerArgKind.Combo, Options = PrivilegeOptions}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "removeuser", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Permanently delete an account.",
+                Usage = "removeuser <username>",
+                Args = new[] {new ServerArg {Label = "Username", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "setpassword", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Change the password of an account.",
+                Usage = "setpassword <username> <new password>",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Username", Required = true},
+                    new ServerArg {Label = "New password", Required = true, Kind = ServerArgKind.Password}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "setprivileges", Category = "Users", Required = AccessLevel.ServerAdmin,
+                Description = "Change an account's access level.",
+                Usage = "setprivileges <username> <privileges>",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Username", Required = true},
+                    new ServerArg {Label = "Privileges", Required = true, Kind = ServerArgKind.Combo, Options = PrivilegeOptions}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "kick", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Disconnect a user (they can log back in).",
+                Usage = "kick <username>",
+                Args = new[] {new ServerArg {Label = "Username", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "ban", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Block an account and disconnect it.",
+                Usage = "ban <username>",
+                Args = new[] {new ServerArg {Label = "Username", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "enableuser", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Lift a ban so a user can log in again.",
+                Usage = "enableuser <username>",
+                Args = new[] {new ServerArg {Label = "Username", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "userinfo", Category = "Users", Required = AccessLevel.ServerAdmin,
+                Description = "Show details for an account.",
+                Usage = "userinfo <username>",
+                Args = new[] {new ServerArg {Label = "Username", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "allusersonline", Category = "Users", Required = AccessLevel.ServerAdmin,
+                Description = "List all users currently connected.",
+                Usage = "allusersonline"
+            },
+            new ServerCommand
+            {
+                Name = "allusers", Category = "Users", Required = AccessLevel.ServerAdmin,
+                Description = "List every registered account.",
+                Usage = "allusers"
+            },
+
+            // ---- Rooms
+            new ServerCommand
+            {
+                Name = "addroom", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Create a new room, optionally protected by a password.",
+                Usage = "addroom <room name> [password]",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Room name", Required = true},
+                    new ServerArg {Label = "Password", Kind = ServerArgKind.Password, Watermark = "optional"}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "removeroom", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Delete a room (the 'General' room cannot be removed).",
+                Usage = "removeroom <room name>",
+                Args = new[] {new ServerArg {Label = "Room name", Required = true}}
+            },
+            new ServerCommand
+            {
+                Name = "setroom", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Move a user into another room.",
+                Usage = "setroom <username> <room name>",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Username", Required = true},
+                    new ServerArg {Label = "Room name", Required = true}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "allusersinroom", Category = "Rooms", Required = AccessLevel.RoomAdmin,
+                Description = "List the accounts in a room.",
+                Usage = "allusersinroom [room name]  (blank = your own room)",
+                Args = new[] {new ServerArg {Label = "Room name", Watermark = "optional - defaults to your room"}}
+            },
+            new ServerCommand
+            {
+                Name = "allrooms", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "List all rooms and their user counts.",
+                Usage = "allrooms"
+            },
+            new ServerCommand
+            {
+                Name = "setroompassword", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Set a room's password (only when the login system is password-only).",
+                Usage = "setroompassword <room name> <password>",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Room name", Required = true},
+                    new ServerArg {Label = "Password", Required = true, Kind = ServerArgKind.Password}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "getroompassword", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Show a room's password (only when the login system is password-only).",
+                Usage = "getroompassword <room name>",
+                Args = new[] {new ServerArg {Label = "Room name", Required = true}}
+            },
+
+            // ---- Server
+            new ServerCommand
+            {
+                Name = "settings", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "List, read or change a server setting.",
+                Usage = "settings                  list all\nsettings <key>             read one\nsettings <key> <value>     change one",
+                Args = new[]
+                {
+                    new ServerArg {Label = "Key", Watermark = "optional - e.g. kicktimer, port, autocreateaccounts"},
+                    new ServerArg {Label = "Value", Watermark = "optional - the new value"}
+                }
+            },
+            new ServerCommand
+            {
+                Name = "setloginsys", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "Choose how users log in.",
+                Usage = "setloginsys <system>",
+                Args = new[] {new ServerArg {Label = "Login system", Required = true, Kind = ServerArgKind.Combo, Options = LoginSystemOptions}}
+            },
+            new ServerCommand
+            {
+                Name = "setkicktime", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "Set how long a kicked user must wait before reconnecting (seconds).",
+                Usage = "setkicktime <seconds>",
+                Args = new[] {new ServerArg {Label = "Seconds", Required = true, Watermark = "e.g. 60"}}
+            },
+            new ServerCommand
+            {
+                Name = "setmaxusersconnection", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "Set the maximum number of simultaneous connections.",
+                Usage = "setmaxusersconnection <max>",
+                Args = new[] {new ServerArg {Label = "Max connections", Required = true, Watermark = "e.g. 100"}}
+            },
+            new ServerCommand
+            {
+                Name = "getport", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "Show the server port.",
+                Usage = "getport"
+            },
+            new ServerCommand
+            {
+                Name = "statistics", Category = "Server", Required = AccessLevel.ServerAdmin,
+                Description = "Show server packet statistics.",
+                Usage = "statistics"
+            }
         };
 
-        private readonly List<(TextBox Box, ComboBox Combo, bool IsCombo)> _serverArgFields = new();
+        private readonly List<ServerArgField> _serverArgFields = new();
+        private readonly Dictionary<string, Button> _serverCommandButtons = new();
+        private ServerCommand _selectedServerCommand;
 
         private void BuildServerCommTab()
         {
-            foreach (string cmd in ServerCommands)
-                ServerCommandCombo.Items.Add(cmd);
-
-            SocketClient.Connected += (s, e) => Dispatcher.UIThread.Post(() => SetServerCommEnabled(true));
-            SocketClient.Disconnected += (s, e) => Dispatcher.UIThread.Post(() => SetServerCommEnabled(false));
-            SocketClient.Waiting += (s, e) => Dispatcher.UIThread.Post(() => SetServerCommEnabled(false));
-
-            EventSink.ServerResponseMessageEvent += (s, e) => Dispatcher.UIThread.Post(() =>
+            string category = null;
+            foreach (ServerCommand cmd in ServerCommands)
             {
-                ServerOutputBox.Text = (ServerOutputBox.Text ?? string.Empty) + $"{DateTime.Now:HH:mm:ss}: {e.Message}{Environment.NewLine}";
-                ServerOutputBox.CaretIndex = ServerOutputBox.Text?.Length ?? 0;
-            });
-
-            SetServerCommEnabled(false);
-        }
-
-        private void SetServerCommEnabled(bool enabled)
-        {
-            ServerCommandCombo.IsEnabled = enabled;
-            ServerSendButton.IsEnabled = enabled;
-        }
-
-        private void OnServerCommandChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ServerArgsPanel.Children.Clear();
-            _serverArgFields.Clear();
-
-            int i = ServerCommandCombo.SelectedIndex;
-            if (i < 0)
-                return;
-
-            ServerCommandDescription.Text = DescribeCommand(ServerCommands[i]);
-
-            foreach ((string label, bool required, bool combo) field in FieldsFor(ServerCommands[i]))
-            {
-                var row = new StackPanel {Orientation = Avalonia.Layout.Orientation.Horizontal, Spacing = 8};
-                row.Children.Add(new TextBlock {Text = field.label + (field.required ? " *:" : ":"), Width = 120, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center});
-
-                if (field.combo)
+                if (cmd.Category != category)
                 {
-                    var cb = new ComboBox {Width = 140};
-                    cb.Items.Add("Normal");
-                    cb.Items.Add("RoomAdmin");
-                    cb.Items.Add("ServerAdmin");
-                    cb.SelectedIndex = 0;
-                    row.Children.Add(cb);
-                    _serverArgFields.Add((null, cb, true));
+                    category = cmd.Category;
+                    ServerCommandListPanel.Children.Add(new TextBlock
+                    {
+                        Text = category,
+                        FontSize = 11,
+                        FontWeight = FontWeight.SemiBold,
+                        Foreground = Brush.Parse("#8FA6C8"),
+                        Margin = new Thickness(6, 8, 0, 3)
+                    });
+                }
+
+                var button = new Button {Content = cmd.Name};
+                button.Classes.Add("cmd");
+                ServerCommand captured = cmd;
+                button.Click += (s, e) => SelectServerCommand(captured);
+                _serverCommandButtons[cmd.Name] = button;
+                ServerCommandListPanel.Children.Add(button);
+            }
+
+            SocketClient.Connected += (s, e) => Dispatcher.UIThread.Post(UpdateSendState);
+            SocketClient.Disconnected += (s, e) => Dispatcher.UIThread.Post(UpdateSendState);
+            SocketClient.Waiting += (s, e) => Dispatcher.UIThread.Post(UpdateSendState);
+
+            EventSink.ServerResponseMessageEvent += (s, e) => Dispatcher.UIThread.Post(() => AppendServerOutput(e.Message));
+
+            if (ServerCommands.Length > 0)
+                SelectServerCommand(ServerCommands[0]);
+
+            UpdateSendState();
+        }
+
+        private void SelectServerCommand(ServerCommand cmd)
+        {
+            _selectedServerCommand = cmd;
+
+            foreach (KeyValuePair<string, Button> pair in _serverCommandButtons)
+            {
+                if (pair.Key == cmd.Name)
+                {
+                    if (!pair.Value.Classes.Contains("selected"))
+                        pair.Value.Classes.Add("selected");
                 }
                 else
                 {
-                    var tb = new TextBox {Width = 220};
-                    row.Children.Add(tb);
-                    _serverArgFields.Add((tb, null, false));
+                    pair.Value.Classes.Remove("selected");
                 }
-
-                ServerArgsPanel.Children.Add(row);
             }
+
+            ServerCommandTitle.Text = cmd.Name;
+            ServerCommandDescription.Text = cmd.Description;
+            ServerCommandUsage.IsVisible = !string.IsNullOrEmpty(cmd.Usage);
+            ServerCommandUsage.Text = ServerCommandUsage.IsVisible ? "Usage:\n" + cmd.Usage : string.Empty;
+
+            ServerArgsPanel.Children.Clear();
+            _serverArgFields.Clear();
+
+            if (cmd.Args.Length == 0)
+            {
+                ServerArgsPanel.Children.Add(new TextBlock
+                {
+                    Text = "This command takes no arguments.",
+                    Foreground = Brush.Parse("#9AA3B2"),
+                    FontStyle = FontStyle.Italic
+                });
+            }
+            else
+            {
+                foreach (ServerArg arg in cmd.Args)
+                    ServerArgsPanel.Children.Add(BuildArgRow(arg));
+            }
+
+            UpdateSendState();
+        }
+
+        private Control BuildArgRow(ServerArg arg)
+        {
+            var row = new StackPanel {Spacing = 4};
+
+            row.Children.Add(new TextBlock
+            {
+                Text = arg.Required ? arg.Label + " *" : arg.Label + "  (optional)",
+                Foreground = Brush.Parse(arg.Required ? "#E6E9EF" : "#9AA3B2"),
+                FontSize = 12
+            });
+
+            if (arg.Kind == ServerArgKind.Combo)
+            {
+                var combo = new ComboBox {Width = 240, HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left};
+                foreach (string option in arg.Options)
+                    combo.Items.Add(option);
+                combo.SelectedIndex = 0;
+                row.Children.Add(combo);
+                _serverArgFields.Add(new ServerArgField {Arg = arg, Combo = combo});
+            }
+            else
+            {
+                var box = new TextBox
+                {
+                    Width = 320,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
+                    Watermark = arg.Watermark
+                };
+
+                if (arg.Kind == ServerArgKind.Password)
+                    box.PasswordChar = '\u2022';
+
+                row.Children.Add(box);
+                _serverArgFields.Add(new ServerArgField {Arg = arg, Text = box});
+            }
+
+            return row;
+        }
+
+        private void UpdateSendState()
+        {
+            bool connected = NetworkManager.SocketClient.IsConnected;
+            AccessLevel mine = NetworkManager.SocketClient.AccessLevel;
+            ServerCommand cmd = _selectedServerCommand;
+
+            ServerSendButton.IsEnabled = connected && cmd != null && mine >= cmd.Required;
+
+            if (cmd == null)
+            {
+                ServerAccessNote.Text = string.Empty;
+                return;
+            }
+
+            if (!connected)
+                ServerAccessNote.Text = "Not connected - connect from the Network tab to send commands.";
+            else if (mine < cmd.Required)
+                ServerAccessNote.Text = $"Requires {Pretty(cmd.Required)} access (you have {Pretty(mine)}).";
+            else
+                ServerAccessNote.Text = $"Access: {Pretty(cmd.Required)}";
         }
 
         private void OnServerSendClick(object sender, RoutedEventArgs e)
         {
-            int i = ServerCommandCombo.SelectedIndex;
-            if (i < 0 || NetworkManager.SocketClient.AccessLevel == AccessLevel.Normal)
+            ServerCommand cmd = _selectedServerCommand;
+            if (cmd == null || !NetworkManager.SocketClient.IsConnected)
                 return;
 
-            var args = new List<string>();
-
-            foreach ((TextBox box, ComboBox combo, bool isCombo) in _serverArgFields)
-                args.Add(isCombo ? combo.SelectedIndex.ToString() : string.IsNullOrEmpty(box.Text) ? string.Empty : box.Text);
-
-            ServerOutputBox.Text = string.Empty;
-            NetworkManager.SocketClient.Send(new PRemoteMessage(ServerMessageType.Normal, ServerCommands[i], args));
-        }
-
-        private static string DescribeCommand(string cmd) => cmd switch
-        {
-            "adduser" => "Add a new user",
-            "addroom" => "Add a new room",
-            "removeuser" => "Remove a user",
-            "removeroom" => "Remove a room",
-            "setroom" => "Assign an existing room to a user",
-            "kick" => "Kick a user from the server",
-            "ban" => "Ban and kick a user",
-            "enableuser" => "Enable a user (after a ban)",
-            "setpassword" => "Set a new password for a user",
-            "allusersonline" => "List all online users",
-            "userinfo" => "Get info for a user",
-            "sendmsg" => "Send a game message to all users",
-            "setprivileges" => "Set account access level",
-            "allrooms" => "List all rooms",
-            "statistics" => "Server packet statistics",
-            "allusersinroom" => "List users in a room",
-            _ => string.Empty
-        };
-
-        private static IEnumerable<(string label, bool required, bool combo)> FieldsFor(string cmd)
-        {
-            switch (cmd)
+            if (NetworkManager.SocketClient.AccessLevel < cmd.Required)
             {
-                case "adduser":
-                    yield return ("Username", true, false);
-                    yield return ("Password", false, false);
-                    yield return ("Room", true, false);
-                    yield return ("Privileges", true, true);
-                    break;
-                case "addroom":
-                    yield return ("Room name", true, false);
-                    break;
-                case "removeuser":
-                    yield return ("Username", false, false);
-                    break;
-                case "removeroom":
-                    yield return ("Room name", true, false);
-                    break;
-                case "setroom":
-                    yield return ("Username", true, false);
-                    yield return ("Room name", true, false);
-                    break;
-                case "kick":
-                case "ban":
-                case "enableuser":
-                    yield return ("Username", false, false);
-                    break;
-                case "setpassword":
-                    yield return ("Username", false, false);
-                    yield return ("New password", false, false);
-                    break;
-                case "userinfo":
-                case "sendmsg":
-                    yield return (cmd == "sendmsg" ? "Message" : "Username", true, false);
-                    break;
-                case "setprivileges":
-                    yield return ("Username", true, false);
-                    yield return ("Privileges", true, true);
-                    break;
-                case "allusersinroom":
-                    yield return ("Room", false, false);
-                    break;
+                AppendServerOutput("You do not have enough privileges for this command.");
+                return;
             }
+
+            var args = new List<string>();
+            foreach (ServerArgField field in _serverArgFields)
+            {
+                string value = field.Arg.Kind == ServerArgKind.Combo
+                    ? field.Combo.SelectedIndex.ToString()
+                    : (field.Text.Text ?? string.Empty).Trim();
+
+                if (field.Arg.Required && string.IsNullOrEmpty(value))
+                {
+                    AppendServerOutput($"'{field.Arg.Label}' is required.");
+                    return;
+                }
+
+                args.Add(value);
+            }
+
+            for (int i = args.Count - 1; i >= 0 && string.IsNullOrEmpty(args[i]); i--)
+                args.RemoveAt(i);
+
+            NetworkManager.SocketClient.Send(new PRemoteMessage(ServerMessageType.Normal, cmd.Name, args));
         }
+
+        private void OnServerClearOutputClick(object sender, RoutedEventArgs e) => ServerOutputBox.Text = string.Empty;
+
+        private void AppendServerOutput(string message)
+        {
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            ServerOutputBox.Text = (ServerOutputBox.Text ?? string.Empty) + $"{DateTime.Now:HH:mm:ss}: {message}{Environment.NewLine}";
+            ServerOutputBox.CaretIndex = ServerOutputBox.Text?.Length ?? 0;
+        }
+
+        private static string Pretty(AccessLevel level) => level switch
+        {
+            AccessLevel.RoomAdmin => "room admin",
+            AccessLevel.ServerAdmin => "server admin",
+            _ => "normal"
+        };
     }
 }

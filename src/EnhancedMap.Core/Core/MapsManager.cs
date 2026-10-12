@@ -49,6 +49,26 @@ namespace EnhancedMap.Core
 
         private static float[] _radPix0, _radPix1, _radPix2;
 
+        /// <summary>Terrain block size in bytes: 4-byte header + 64 cells * 3 bytes.</summary>
+        private const int MAP_BLOCK_BYTES = 196;
+
+        /// <summary>Tiles covered by a single terrain block (8x8).</summary>
+        private const int MAP_BLOCK_TILES = 64;
+
+        /// <summary>
+        ///     Standard retail UO facet dimensions, indexed by facet. Map files do not store
+        ///     their size, so these are used to pre-fill and validate size detection.
+        /// </summary>
+        public static readonly (int Width, int Height)[] StandardMapSizes =
+        {
+            (7168, 4096), // 0 Felucca
+            (7168, 4096), // 1 Trammel
+            (2304, 1600), // 2 Ilshenar
+            (2560, 2048), // 3 Malas
+            (1448, 1448), // 4 Tokuno
+            (1280, 4096) // 5 TerMur
+        };
+
         public static void RemoveMapsFiles()
         {
             if (File.Exists(MAPS_XML))
@@ -68,6 +88,126 @@ namespace EnhancedMap.Core
                     }
                 }
             }
+        }
+
+        /// <summary>
+        ///     Enumerate the supported map terrain files (<c>mapN.mul</c> / <c>mapNLegacyMUL.uop</c>)
+        ///     present in <paramref name="folder"/>, preferring the UOP when both exist.
+        /// </summary>
+        public static List<(int Index, string Path)> FindMapFiles(string folder)
+        {
+            var found = new Dictionary<int, (string Path, bool IsUop)>();
+
+            if (!string.IsNullOrEmpty(folder) && Directory.Exists(folder))
+            {
+                try
+                {
+                    foreach (string full in Directory.EnumerateFiles(folder))
+                    {
+                        string lower = Path.GetFileName(full).ToLowerInvariant();
+                        if (!lower.StartsWith("map"))
+                            continue;
+
+                        string digits;
+                        bool isUop;
+
+                        if (lower.EndsWith(".mul"))
+                        {
+                            digits = lower.Substring(3, lower.Length - 3 - 4);
+                            isUop = false;
+                        }
+                        else if (lower.EndsWith("legacymul.uop"))
+                        {
+                            digits = lower.Substring(3, lower.Length - 3 - "legacymul.uop".Length);
+                            isUop = true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        if (digits.Length == 0 || !digits.All(char.IsDigit))
+                            continue;
+
+                        if (!int.TryParse(digits, out int index))
+                            continue;
+
+                        if (index < 0 || index >= Global.Maps.Length)
+                            continue; // only facets the map model can hold
+
+                        if (!found.TryGetValue(index, out var existing) || (isUop && !existing.IsUop))
+                            found[index] = (full, isUop);
+                    }
+                }
+                catch
+                {
+                    // ignore unreadable folders
+                }
+            }
+
+            return found.OrderBy(kvp => kvp.Key).Select(kvp => (kvp.Key, kvp.Value.Path)).ToList();
+        }
+
+        /// <summary>
+        ///     Try to determine a map's width and height from its terrain file. Map files do
+        ///     not store their dimensions, but the terrain is a fixed 196-byte block per 8x8
+        ///     tiles, so the total tile count (Width * Height) is derivable from the data
+        ///     size. A matching standard dimension pair is returned when one exists.
+        /// </summary>
+        public static bool TryDetectMapSize(int index, string path, out int width, out int height)
+        {
+            width = 0;
+            height = 0;
+
+            long size;
+            try
+            {
+                size = GetMapDataSize(path);
+            }
+            catch
+            {
+                return false;
+            }
+
+            long totalTiles = size / MAP_BLOCK_BYTES * MAP_BLOCK_TILES;
+
+            // Prefer the facet's own standard size when it matches the file.
+            if (index >= 0 && index < StandardMapSizes.Length
+                           && (long) StandardMapSizes[index].Width * StandardMapSizes[index].Height == totalTiles)
+            {
+                width = StandardMapSizes[index].Width;
+                height = StandardMapSizes[index].Height;
+                return true;
+            }
+
+            // Otherwise accept any known standard size with the same tile count.
+            foreach ((int w, int h) in StandardMapSizes)
+            {
+                if ((long) w * h == totalTiles)
+                {
+                    width = w;
+                    height = h;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static long GetMapDataSize(string path)
+        {
+            if (path.EndsWith(".uop", StringComparison.OrdinalIgnoreCase))
+            {
+                UOPFile[] files = ReadUOPFile(path, Path.GetFileName(path).Replace(".uop", string.Empty).ToLowerInvariant());
+
+                long total = 0;
+                for (int i = 0; i < files.Length; i++)
+                    total += files[i].Length;
+
+                return total;
+            }
+
+            return new FileInfo(path).Length;
         }
 
         public static bool CheckMapExists()

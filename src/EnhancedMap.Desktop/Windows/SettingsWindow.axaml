@@ -72,6 +72,29 @@
       <Setter Property="BorderBrush" Value="#C98F49" />
     </Style>
 
+    <Style Selector="Button.cmd">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="10,6" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style Selector="Button.cmd:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2B333F" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.cmd.selected">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="#171205" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.cmd.selected:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
     <Style Selector="TextBox">
       <Setter Property="CornerRadius" Value="6" />
       <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
@@ -91,7 +114,7 @@
       <Setter Property="CornerRadius" Value="6" />
     </Style>
 
-    <Style Selector="CheckBox, RadioButton">
+    <Style Selector="CheckBox">
       <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
     </Style>
   </Window.Styles>
@@ -109,64 +132,68 @@
       <Button Name="OkButton" Classes="accent" Content="OK" Width="90" Click="OnOkClick" />
     </StackPanel>
 
-    <TabControl>
-      <TabItem Header="Network">
-        <ScrollViewer>
-          <Grid Margin="8" ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Username:" VerticalAlignment="Center" />
-            <TextBox Grid.Row="0" Grid.Column="1" Name="TextName" MaxLength="16" />
+    <TabControl Name="Tabs">
+      <TabItem Header="Network" Name="NetworkTab">
+        <DockPanel Margin="8">
+          <TextBlock DockPanel.Dock="Top" Name="ConnectionErrorText" Foreground="#D9534F" TextWrapping="Wrap"
+                     IsVisible="False" Margin="0,0,0,8" />
+          <ScrollViewer>
+            <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Username:" VerticalAlignment="Center" ToolTip.Tip="The account name used to log in to the shard (up to 16 characters)." />
+            <TextBox Grid.Row="0" Grid.Column="1" Name="TextName" MaxLength="16" ToolTip.Tip="The account name used to log in to the shard (up to 16 characters)." />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" VerticalAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Name="TextPassword" PasswordChar="*" MaxLength="16" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Password:" VerticalAlignment="Center" ToolTip.Tip="The password used to log in to the shard." />
+            <TextBox Grid.Row="1" Grid.Column="1" Name="TextPassword" PasswordChar="*" MaxLength="16" ToolTip.Tip="The password used to log in to the shard." />
 
-            <CheckBox Grid.Row="2" Grid.Column="1" Name="CheckRememberCredentials" Content="Remember credentials" />
+            <CheckBox Grid.Row="2" Grid.Column="1" Name="CheckRememberCredentials" Content="Remember credentials" ToolTip.Tip="Save your username and password so they are filled in automatically next time." />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Server IP:" VerticalAlignment="Center" />
-            <TextBox Grid.Row="3" Grid.Column="1" Name="TextIp" />
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Server IP:" VerticalAlignment="Center" ToolTip.Tip="Hostname or IP address of the Enhanced Map server to connect to." />
+            <TextBox Grid.Row="3" Grid.Column="1" Name="TextIp" ToolTip.Tip="Hostname or IP address of the Enhanced Map server to connect to." />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Server port:" VerticalAlignment="Center" />
-            <TextBox Grid.Row="4" Grid.Column="1" Name="TextPort" Width="120" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Server port:" VerticalAlignment="Center" ToolTip.Tip="Network port the server listens on (default 8887)." />
+            <TextBox Grid.Row="4" Grid.Column="1" Name="TextPort" Width="120" HorizontalAlignment="Left" ToolTip.Tip="Network port the server listens on (default 8887)." />
 
-            <CheckBox Grid.Row="5" Grid.Column="1" Name="CheckRememberServer" Content="Remember server" />
+            <CheckBox Grid.Row="5" Grid.Column="1" Name="CheckRememberServer" Content="Remember server" ToolTip.Tip="Remember the last server IP and port you connected to." />
 
-            <CheckBox Grid.Row="6" Grid.Column="1" Name="CheckAutoLogin" Content="Auto login at start" />
+            <CheckBox Grid.Row="6" Grid.Column="1" Name="CheckAutoLogin" Content="Auto login at start" ToolTip.Tip="Automatically connect to the remembered server when Enhanced Map starts." />
 
-            <CheckBox Grid.Row="7" Grid.Column="1" Name="CheckTryReconnect" Content="Try to reconnect" />
+            <CheckBox Grid.Row="7" Grid.Column="1" Name="CheckTryReconnect" Content="Try to reconnect" ToolTip.Tip="Automatically try to reconnect if the connection to the server is lost." />
 
-            <TextBlock Grid.Row="8" Grid.Column="0" Text="Reconnect delay (ms):" VerticalAlignment="Center" />
-            <NumericUpDown Grid.Row="8" Grid.Column="1" Name="NumReconnect" Minimum="1000" Maximum="600000" Increment="1000" Width="140" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Reconnect delay (ms):" VerticalAlignment="Center" ToolTip.Tip="How long to wait, in milliseconds, between reconnect attempts." />
+            <TextBox Grid.Row="8" Grid.Column="1" Name="TextReconnect" Width="140" HorizontalAlignment="Left" ToolTip.Tip="How long to wait, in milliseconds, between reconnect attempts." />
 
-            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Classes="accent" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" />
-          </Grid>
-        </ScrollViewer>
+            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Classes="accent" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" ToolTip.Tip="Connect to (or disconnect from) the server using the details above." />
+            </Grid>
+          </ScrollViewer>
+        </DockPanel>
       </TabItem>
 
       <TabItem Header="General">
         <ScrollViewer>
           <WrapPanel Margin="8" Orientation="Horizontal" ItemWidth="250">
-            <CheckBox Name="CheckShowHits" Content="Show hits bar" />
-            <CheckBox Name="CheckShowStamina" Content="Show stamina bar" />
-            <CheckBox Name="CheckShowMana" Content="Show mana bar" />
+            <CheckBox Name="CheckShowHits" Content="Show hits bar" ToolTip.Tip="Show the hits (health) bar for each user." />
+            <CheckBox Name="CheckShowStamina" Content="Show stamina bar" ToolTip.Tip="Show the stamina bar for each user." />
+            <CheckBox Name="CheckShowMana" Content="Show mana bar" ToolTip.Tip="Show the mana bar for each user." />
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Center on user:" VerticalAlignment="Center" />
-              <ComboBox Name="ComboCenterUser" Width="130" SelectionChanged="OnCenterUserChanged" />
+              <TextBlock Text="Center on user:" VerticalAlignment="Center" ToolTip.Tip="Choose which user the map stays centered on." />
+              <ComboBox Name="ComboCenterUser" Width="130" SelectionChanged="OnCenterUserChanged" ToolTip.Tip="Choose which user the map stays centered on." />
             </StackPanel>
-            <CheckBox Name="CheckTrackDeathPoint" Content="Track death points" />
-            <CheckBox Name="CheckShowHiddenIcon" Content="Show hidden icon" />
-            <CheckBox Name="CheckShowDeathIcon" Content="Show death icon" />
-            <CheckBox Name="CheckAbbreviateNames" Content="Abbreviate names" />
-            <CheckBox Name="CheckPanicSounds" Content="Panic sounds" />
-            <CheckBox Name="CheckAlertSounds" Content="Alert sounds" />
-            <CheckBox Name="CheckSmartNamePosition" Content="Smart names position" />
-            <CheckBox Name="CheckShowPlacesIcons" Content="Show places icons" />
-            <CheckBox Name="CheckHideLessImportantPlaces" Content="Hide less important places" />
-            <CheckBox Name="CheckShowTownsNames" Content="Show towns names" />
-            <CheckBox Name="CheckShowServerBounds" Content="Show server bounds" />
-            <CheckBox Name="CheckShowGuardlines" Content="Show guard lines" />
-            <CheckBox Name="CheckShowCoordinates" Content="Show coordinates" />
-            <CheckBox Name="CheckShowHouses" Content="Show houses" />
-            <CheckBox Name="CheckShowMobilesAround" Content="Show mobiles around you" />
-            <CheckBox Name="CheckDontRenderUsersDiffFacet" Content="Don't render users on other facets" />
+            <CheckBox Name="CheckTrackDeathPoint" Content="Track death points" ToolTip.Tip="Mark on the map where each user last died." />
+            <CheckBox Name="CheckShowHiddenIcon" Content="Show hidden icon" ToolTip.Tip="Draw the hidden/stealth icon on characters." />
+            <CheckBox Name="CheckShowDeathIcon" Content="Show death icon" ToolTip.Tip="Draw a death icon over dead characters." />
+            <CheckBox Name="CheckAbbreviateNames" Content="Abbreviate names" ToolTip.Tip="Shorten long character names shown on the map." />
+            <CheckBox Name="CheckPanicSounds" Content="Panic sounds" ToolTip.Tip="Play a sound when the character you are following panics." />
+            <CheckBox Name="CheckAlertSounds" Content="Alert sounds" ToolTip.Tip="Play a sound when the character you are following sends an alert." />
+            <CheckBox Name="CheckSmartNamePosition" Content="Smart names position" ToolTip.Tip="Automatically reposition names to avoid overlapping." />
+            <CheckBox Name="CheckShowPlacesIcons" Content="Show places icons" ToolTip.Tip="Show icons for notable places on the map." />
+            <CheckBox Name="CheckHideLessImportantPlaces" Content="Hide less important places" ToolTip.Tip="Hide place icons that are considered less important." />
+            <CheckBox Name="CheckShowTownsNames" Content="Show towns names" ToolTip.Tip="Show the names of towns on the map." />
+            <CheckBox Name="CheckShowServerBounds" Content="Show server bounds" ToolTip.Tip="Draw the boundary of the server's map area." />
+            <CheckBox Name="CheckShowGuardlines" Content="Show guard lines" ToolTip.Tip="Draw the guard lines that separate guard zones." />
+            <CheckBox Name="CheckShowCoordinates" Content="Show coordinates" ToolTip.Tip="Show the coordinates of the mouse position." />
+            <CheckBox Name="CheckShowHouses" Content="Show houses" ToolTip.Tip="Show houses on the map." />
+            <CheckBox Name="CheckShowMobilesAround" Content="Show mobiles around you" ToolTip.Tip="Show creatures and mobiles near your character." />
+            <CheckBox Name="CheckDontRenderUsersDiffFacet" Content="Don't render users on other facets" ToolTip.Tip="Hide users who are on a different facet than you." />
           </WrapPanel>
         </ScrollViewer>
       </TabItem>
@@ -174,25 +201,19 @@
       <TabItem Header="Application">
         <ScrollViewer>
           <StackPanel Margin="8" Spacing="6">
-            <TextBlock Text="Client type:" />
-            <StackPanel Orientation="Horizontal" Spacing="12">
-              <RadioButton Name="RadioClassic" Content="Classic" GroupName="client" />
-              <RadioButton Name="RadioEnhanced" Content="Enhanced" GroupName="client" />
-              <RadioButton Name="RadioOrion" Content="Orion" GroupName="client" />
-            </StackPanel>
-            <CheckBox Name="CheckShowScrollbars" Content="Show scrollbars" />
-            <CheckBox Name="CheckOpenChatAtStart" Content="Open chat at start" />
-            <CheckBox Name="CheckShowIncomingMsg" Content="Show incoming messages" />
-            <CheckBox Name="CheckSoundsIncomingMsg" Content="Sounds on incoming messages" />
-            <CheckBox Name="CheckLoadMapsOnDemand" Content="Load maps on demand" />
-            <CheckBox Name="CheckShowFps" Content="Show FPS" />
+            <CheckBox Name="CheckShowScrollbars" Content="Show scrollbars" ToolTip.Tip="Show scrollbars on the map view." />
+            <CheckBox Name="CheckOpenChatAtStart" Content="Open chat at start" ToolTip.Tip="Open the chat window automatically when Enhanced Map starts." />
+            <CheckBox Name="CheckShowIncomingMsg" Content="Show incoming messages" ToolTip.Tip="Display messages received from other players." />
+            <CheckBox Name="CheckSoundsIncomingMsg" Content="Sounds on incoming messages" ToolTip.Tip="Play a sound when a new message arrives." />
+            <CheckBox Name="CheckLoadMapsOnDemand" Content="Load maps on demand" ToolTip.Tip="Only load map files when needed to reduce memory usage." />
+            <CheckBox Name="CheckShowFps" Content="Show FPS" ToolTip.Tip="Display the current frames per second on screen." />
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="FPS:" VerticalAlignment="Center" />
-              <NumericUpDown Name="NumFps" Minimum="1" Maximum="120" Width="120" />
+              <TextBlock Text="FPS:" VerticalAlignment="Center" ToolTip.Tip="Target frames per second the map tries to render." />
+              <NumericUpDown Name="NumFps" Minimum="1" Maximum="120" Width="120" ToolTip.Tip="Target frames per second the map tries to render." />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Chat font size:" VerticalAlignment="Center" />
-              <NumericUpDown Name="NumChatFontSize" Minimum="6" Maximum="48" Width="120" />
+              <TextBlock Text="Chat font size:" VerticalAlignment="Center" ToolTip.Tip="Font size used for text in the chat window." />
+              <NumericUpDown Name="NumChatFontSize" Minimum="6" Maximum="48" Width="120" ToolTip.Tip="Font size used for text in the chat window." />
             </StackPanel>
           </StackPanel>
         </ScrollViewer>
@@ -200,8 +221,8 @@
 
       <TabItem Header="Diagnostic">
         <DockPanel Margin="8">
-          <Button DockPanel.Dock="Top" Name="SaveLogButton" Content="Save log" Width="90" HorizontalAlignment="Left" Margin="0,0,0,6" Click="OnSaveLogClick" />
-          <CheckBox DockPanel.Dock="Top" Name="CheckAutoScroll" Content="Auto scroll" Margin="0,0,0,6" />
+          <Button DockPanel.Dock="Top" Name="SaveLogButton" Content="Save log" Width="90" HorizontalAlignment="Left" Margin="0,0,0,6" Click="OnSaveLogClick" ToolTip.Tip="Save the current diagnostic log to a file." />
+          <CheckBox DockPanel.Dock="Top" Name="CheckAutoScroll" Content="Auto scroll" Margin="0,0,0,6" ToolTip.Tip="Keep the log scrolled to the newest entries." />
           <ScrollViewer Name="LogScroller" VerticalScrollBarVisibility="Auto">
             <StackPanel Name="LogPanel" />
           </ScrollViewer>
@@ -211,11 +232,11 @@
       <TabItem Header="Labels">
         <DockPanel Margin="8">
           <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
-            <Button Content="Enable all" Click="OnLabelsEnableAll" />
-            <Button Content="Disable all" Click="OnLabelsDisableAll" />
-            <Button Content="Show names" Click="OnLabelsShowNames" />
-            <Button Content="Hide names" Click="OnLabelsHideNames" />
-            <Button Content="Refresh" Click="OnLabelsRefresh" />
+            <Button Content="Enable all" Click="OnLabelsEnableAll" ToolTip.Tip="Enable every label set." />
+            <Button Content="Disable all" Click="OnLabelsDisableAll" ToolTip.Tip="Disable every label set." />
+            <Button Content="Show names" Click="OnLabelsShowNames" ToolTip.Tip="Show names for all label entries." />
+            <Button Content="Hide names" Click="OnLabelsHideNames" ToolTip.Tip="Hide names for all label entries." />
+            <Button Content="Refresh" Click="OnLabelsRefresh" ToolTip.Tip="Reload the available label sets from disk." />
           </StackPanel>
           <Grid ColumnDefinitions="260,*">
             <ScrollViewer Grid.Column="0">
@@ -229,20 +250,58 @@
       </TabItem>
 
       <TabItem Header="Server Commands">
-        <DockPanel Margin="8">
-          <StackPanel DockPanel.Dock="Top" Spacing="8">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Command:" VerticalAlignment="Center" />
-              <ComboBox Name="ServerCommandCombo" Width="200" SelectionChanged="OnServerCommandChanged" />
+        <Grid Margin="8" ColumnDefinitions="230,*" ColumnSpacing="12">
+          <Border Grid.Column="0" CornerRadius="8" Background="{DynamicResource FieldBrush}"
+                  BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+            <DockPanel Margin="6">
+              <TextBlock DockPanel.Dock="Top" Text="Commands" FontSize="12" FontWeight="SemiBold"
+                         Foreground="{DynamicResource MutedTextBrush}" Margin="6,4,0,6" />
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Name="ServerCommandListPanel" Spacing="1" />
+              </ScrollViewer>
+            </DockPanel>
+          </Border>
+
+          <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,160" RowSpacing="10">
+            <StackPanel Grid.Row="0" Spacing="3">
+              <TextBlock Name="ServerCommandTitle" FontSize="16" FontWeight="Bold"
+                         Foreground="{DynamicResource AccentBrush}" />
+              <TextBlock Name="ServerCommandDescription" TextWrapping="Wrap" />
+              <TextBlock Name="ServerCommandUsage" FontFamily="Consolas,Menlo,monospace" FontSize="12"
+                         TextWrapping="Wrap" Foreground="#8FA6C8" />
             </StackPanel>
-            <TextBlock Name="ServerCommandDescription" TextWrapping="Wrap" Foreground="#AAAAAA" />
-            <StackPanel Name="ServerArgsPanel" Spacing="6" />
-            <Button Name="ServerSendButton" Classes="accent" Content="Send" Width="90" HorizontalAlignment="Left" Click="OnServerSendClick" />
-          </StackPanel>
-          <TextBox Name="ServerOutputBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
-                   ScrollViewer.VerticalScrollBarVisibility="Auto"
-                   ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="0,8,0,0" />
-        </DockPanel>
+
+            <Border Grid.Row="1" CornerRadius="8" Background="{DynamicResource FieldBrush}"
+                    BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1" Padding="12">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Name="ServerArgsPanel" Spacing="8" />
+              </ScrollViewer>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+              <Button Name="ServerSendButton" Classes="accent" Content="Send command" IsEnabled="False"
+                      Click="OnServerSendClick" />
+              <TextBlock Name="ServerAccessNote" VerticalAlignment="Center"
+                         Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Border Grid.Row="3" CornerRadius="8" Background="{DynamicResource FieldBrush}"
+                    BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1" Padding="8">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="2,0,2,6">
+                  <TextBlock Text="Server response" FontSize="12" FontWeight="SemiBold"
+                             Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                  <Button Grid.Column="1" Name="ServerClearOutputButton" Content="Clear"
+                          Padding="10,3" Click="OnServerClearOutputClick" />
+                </Grid>
+                <TextBox Name="ServerOutputBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+                         Background="Transparent" BorderThickness="0"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+              </DockPanel>
+            </Border>
+          </Grid>
+        </Grid>
       </TabItem>
 
       <TabItem Header="About">

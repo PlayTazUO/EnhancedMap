@@ -131,7 +131,6 @@ namespace EnhancedMap.Core
             {"namestyle", (int) FontStyle.Regular},
 
             // application
-            {"clienttype", 0},
             {"showscrollbarls", false},
             {"openchatatstart", false},
             {"showincomingmsg", false},
@@ -189,6 +188,16 @@ namespace EnhancedMap.Core
                 TrackedUser = user;
                 FreeView = false;
             }
+        }
+
+        /// <summary>
+        ///     True when the given user is the one currently being followed (see <see cref="CenterOn" />).
+        ///     Settings that relate to "our" character are scoped to the followed user, since there is
+        ///     no local player object.
+        /// </summary>
+        public static bool IsTrackedUser(UserObject user)
+        {
+            return user != null && !user.IsDisposing && ReferenceEquals(user, TrackedUser);
         }
 
 

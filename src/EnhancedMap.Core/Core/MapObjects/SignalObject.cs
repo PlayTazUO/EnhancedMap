@@ -10,7 +10,7 @@ namespace EnhancedMap.Core.MapObjects
         private static readonly Pen _pen = new Pen(Color.Cyan);
         private AnimationManager _animationManager;
 
-        public SignalObject(int x, int y) : base("signal")
+        public SignalObject(int x, int y, bool playSound = false) : base("signal")
         {
             _animationManager = new AnimationManager(false) {Increment = 0.05, AnimationType = AnimationType.EaseOut};
             UpdatePosition(x, y);
@@ -24,7 +24,7 @@ namespace EnhancedMap.Core.MapObjects
 
             };*/
 
-            if (Global.SettingsCollection["alertsounds"].ToBool())
+            if (playSound && Global.SettingsCollection["alertsounds"].ToBool())
                 SoundsManager.Play(SOUNDS_TYPE.SIGNAL);
 
             LifeTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromSeconds(2));

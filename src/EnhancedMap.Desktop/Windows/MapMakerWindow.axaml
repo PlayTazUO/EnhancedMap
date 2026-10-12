@@ -1,54 +1,126 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="EnhancedMap.Desktop.Windows.MapMakerWindow"
-        Width="560" Height="520"
+        Width="640" Height="560"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Title="Map Maker">
-  <Grid Margin="12">
-    <StackPanel Name="KindPanel" Spacing="12" VerticalAlignment="Top">
-      <TextBlock Text="Map Maker" FontSize="20" />
-      <TextBlock Text="Choose the map source:" />
-      <Button Content="Original Maps" Height="64" HorizontalAlignment="Stretch" Click="OnOriginalClick" />
-      <Button Content="Custom Maps" Height="64" HorizontalAlignment="Stretch" Click="OnCustomClick" />
-    </StackPanel>
+  <Window.Background>
+    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+      <GradientStop Color="#0F1218" Offset="0" />
+      <GradientStop Color="#1A1F2A" Offset="1" />
+    </LinearGradientBrush>
+  </Window.Background>
 
-    <StackPanel Name="OriginalPanel" Spacing="10" VerticalAlignment="Top" IsVisible="False">
-      <TextBlock Text="Original Maps" FontSize="20" />
-      <Button Content="Download pre-built maps" Height="48" HorizontalAlignment="Stretch" Click="OnDownloadClick" />
-      <Button Content="Generate from UO client data" Height="48" HorizontalAlignment="Stretch" Click="OnGenerateOriginalClick" />
-      <Button Content="Back" Width="90" HorizontalAlignment="Right" Click="OnBackClick" />
-    </StackPanel>
+  <Window.Resources>
+    <Color x:Key="SystemAccentColor">#E0A458</Color>
+    <SolidColorBrush x:Key="AccentBrush">#E0A458</SolidColorBrush>
+    <SolidColorBrush x:Key="AccentHoverBrush">#F0BB74</SolidColorBrush>
+    <SolidColorBrush x:Key="TextBrush">#E6E9EF</SolidColorBrush>
+    <SolidColorBrush x:Key="MutedTextBrush">#9AA3B2</SolidColorBrush>
+    <SolidColorBrush x:Key="FieldBrush">#1B202B</SolidColorBrush>
+    <SolidColorBrush x:Key="FieldBorderBrush">#39424F</SolidColorBrush>
+    <SolidColorBrush x:Key="SurfaceBrush">#20262F</SolidColorBrush>
+  </Window.Resources>
 
-    <StackPanel Name="CustomPanel" Spacing="8" IsVisible="False">
-      <TextBlock Text="Custom Maps" FontSize="20" />
-      <Grid ColumnDefinitions="90,*,90,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="6">
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="Index:" VerticalAlignment="Center" />
-        <NumericUpDown Grid.Row="0" Grid.Column="1" Name="IndexBox" Minimum="0" Maximum="5" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="Name:" VerticalAlignment="Center" />
-        <TextBox Grid.Row="0" Grid.Column="3" Name="NameBox" />
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Width:" VerticalAlignment="Center" />
-        <NumericUpDown Grid.Row="1" Grid.Column="1" Name="WidthBox" Minimum="0" Maximum="16384" Increment="8" />
-        <TextBlock Grid.Row="1" Grid.Column="2" Text="Height:" VerticalAlignment="Center" />
-        <NumericUpDown Grid.Row="1" Grid.Column="3" Name="HeightBox" Minimum="0" Maximum="16384" Increment="8" />
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+    </Style>
+
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="14,6" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style Selector="Button:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2B333F" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+    <Style Selector="Button:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#161B23" />
+    </Style>
+
+    <Style Selector="Button.accent">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="#171205" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}" />
+    </Style>
+    <Style Selector="Button.accent:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#C98F49" />
+      <Setter Property="BorderBrush" Value="#C98F49" />
+    </Style>
+
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
+      <Setter Property="Padding" Value="8,6" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="12">
+    <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+      <StackPanel Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="4" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+          <TextBlock Text="Enhanced Map — Map Maker" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}"
+                   Text="EnhancedMap draws its own map images from your Ultima Online client files, so they must be generated once before the map can be shown. Pick your client folder below: every map file found is listed with its size pre-filled. Only change a name or size if your shard uses custom maps, then click Generate." />
+      </StackPanel>
+    </Border>
+
+    <Grid>
+      <Grid Name="MainPanel" RowDefinitions="Auto,Auto,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,6">
+          <TextBlock Grid.Column="0" Text="UO folder:" VerticalAlignment="Center" Margin="0,0,8,0" />
+          <TextBox Grid.Column="1" Name="FolderBox" IsReadOnly="True" />
+          <Button Grid.Column="2" Content="Browse..." Margin="8,0,0,0" Click="OnBrowseClick" />
+        </Grid>
+
+        <TextBlock Grid.Row="1" Name="StatusText" Foreground="#D9534F" TextWrapping="Wrap" Margin="0,0,0,6" />
+
+        <Border Grid.Row="2" CornerRadius="8" Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1" Padding="8">
+          <DockPanel>
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="70,*,130,130,32" Margin="0,0,0,6">
+              <TextBlock Grid.Column="0" Text="Index" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" />
+              <TextBlock Grid.Column="1" Text="Name" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" />
+              <TextBlock Grid.Column="2" Text="Width" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" />
+              <TextBlock Grid.Column="3" Text="Height" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" />
+            </Grid>
+            <ScrollViewer>
+              <StackPanel Name="MapsPanel" Spacing="6" />
+            </ScrollViewer>
+          </DockPanel>
+        </Border>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+          <Button Content="Generate" Width="110" Classes="accent" Click="OnGenerateClick" />
+          <Button Content="Close" Width="90" Click="OnCloseClick" />
+        </StackPanel>
       </Grid>
-      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-        <Button Content="Add" Width="90" Click="OnAddCustomClick" />
-        <Button Content="Remove" Width="90" Click="OnRemoveCustomClick" />
-      </StackPanel>
-      <ListBox Name="CustomList" Height="200" />
-      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-        <Button Content="Generate" Width="110" Click="OnGenerateCustomClick" />
-        <Button Content="Back" Width="90" Click="OnBackClick" />
-      </StackPanel>
-    </StackPanel>
 
-    <DockPanel Name="ProgressPanel" IsVisible="False">
-      <TextBlock DockPanel.Dock="Top" Name="ProgressTitle" Text="Generating maps..." FontSize="18" Margin="0,0,0,8" />
-      <Button DockPanel.Dock="Bottom" Name="CloseButton" Content="Close" Width="90" HorizontalAlignment="Right" Margin="0,8,0,0" IsEnabled="False" Click="OnCloseClick" />
-      <TextBox Name="ProgressBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
-               ScrollViewer.VerticalScrollBarVisibility="Auto"
-               ScrollViewer.HorizontalScrollBarVisibility="Auto" />
-    </DockPanel>
-  </Grid>
+      <DockPanel Name="ProgressPanel" IsVisible="False">
+        <TextBlock DockPanel.Dock="Top" Name="ProgressTitle" Text="Generating maps..." FontSize="18" Margin="0,0,0,8" />
+        <Button DockPanel.Dock="Bottom" Name="CloseButton" Content="Close" Width="90" HorizontalAlignment="Right" Margin="0,8,0,0" IsEnabled="False" Click="OnCloseClick" />
+        <TextBox Name="ProgressBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="NoWrap"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" />
+      </DockPanel>
+    </Grid>
+  </DockPanel>
 </Window>

@@ -36,26 +36,31 @@ namespace EnhancedMap.Core.Network
 
         public static SocketClient SocketClient { get; }
 
-        public static void Connect()
+        /// <summary>
+        ///     Validates the configured connection settings and, if valid, starts connecting.
+        ///     Returns <c>false</c> when the settings are invalid (bad address/port/credentials);
+        ///     callers can use this to send the user to the settings screen.
+        /// </summary>
+        public static bool Connect()
         {
             string ip = Global.SettingsCollection["ip"].ToString();
             int port = Global.SettingsCollection["port"].ToInt();
 
-            IPAddress addr = null;
-            if ((addr = Resolve(ip)) == IPAddress.None || addr == null)
-                NotificationManager.Warn("Invalid address");
-            else if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
-                NotificationManager.Warn("Invalid port");
-            else if (string.IsNullOrEmpty(Global.SettingsCollection["username"].ToString()))
-                NotificationManager.Warn("Invalid Username");
-            else if (string.IsNullOrEmpty(Global.SettingsCollection["password"].ToString()))
-                NotificationManager.Warn("Invalid Password");
-            else
-            {
-                if (_TimerReconnect.IsRunning)
-                    _TimerReconnect.Stop();
-                SocketClient.Connect(new IPEndPoint(addr, port));
-            }
+            IPAddress addr = Resolve(ip);
+            if (addr == null || addr == IPAddress.None)
+                return false;
+            if (port < IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
+                return false;
+            if (string.IsNullOrEmpty(Global.SettingsCollection["username"].ToString()))
+                return false;
+            if (string.IsNullOrEmpty(Global.SettingsCollection["password"].ToString()))
+                return false;
+
+            if (_TimerReconnect.IsRunning)
+                _TimerReconnect.Stop();
+
+            SocketClient.Connect(new IPEndPoint(addr, port));
+            return true;
         }
 
         public static void Disconnect(bool reconnect)

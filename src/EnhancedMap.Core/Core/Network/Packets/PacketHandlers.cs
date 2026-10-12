@@ -138,7 +138,7 @@ namespace EnhancedMap.Core.Network
             string username = p.ReadASCII(p.ReadByte());
 
             UserObject user = RenderObjectsManager.GetUser(username);
-            SignalObject signal = new SignalObject(x, y);
+            SignalObject signal = new SignalObject(x, y, Global.IsTrackedUser(user));
             RenderObjectsManager.AddSignal(signal);
 
             UOClientManager.SysMessage(string.Format("[Alert][{0}] sends an alert!", user.Name), 83);
@@ -246,7 +246,7 @@ namespace EnhancedMap.Core.Network
                     user.IsParalyzed = true;
                     break;
                 case 4:
-                    if (!user.IsDead)
+                    if (!user.IsDead && Global.SettingsCollection["trackdeathpoint"].ToBool())
                         RenderObjectsManager.AddDeathObject(new DeathObject(user, user.Position, user.Map));
                     user.IsDead = true;
                     break;
@@ -268,7 +268,7 @@ namespace EnhancedMap.Core.Network
             }
             else if (!user.InPanic && panic) // receive panic signal
             {
-                if (Global.SettingsCollection["panicsounds"].ToBool())
+                if (Global.IsTrackedUser(user) && Global.SettingsCollection["panicsounds"].ToBool())
                     SoundsManager.Play(SOUNDS_TYPE.PANIC);
                 UOClientManager.SysMessage($"[Panic][{user.Name}] Starts to panic!", 83);
                 user.LastPanicUpdate = DateTime.Now.AddSeconds(5);

@@ -295,7 +295,7 @@ namespace EnhancedMap.Desktop
 
         private void SendSignal()
         {
-            RenderObjectsManager.AddSignal(new SignalObject(MouseManager.Location.X, MouseManager.Location.Y));
+            RenderObjectsManager.AddSignal(new SignalObject(MouseManager.Location.X, MouseManager.Location.Y, true));
             if (NetworkManager.SocketClient.IsConnected)
                 NetworkManager.SocketClient.Send(new PAlert((ushort) MouseManager.Location.X, (ushort) MouseManager.Location.Y));
         }
@@ -446,7 +446,8 @@ namespace EnhancedMap.Desktop
             else
             {
                 SettingsWindow.ApplySettings();
-                NetworkManager.Connect();
+                if (!NetworkManager.Connect())
+                    SettingsWindow.ShowConnectionError(this, "Failed to connect. Check the server address, port and credentials.");
             }
         }
 
@@ -534,6 +535,7 @@ namespace EnhancedMap.Desktop
 
         private void OnSettingsClick(object sender, RoutedEventArgs e)
         {
+            SettingsWindow.ClearConnectionError();
             SettingsWindow.RefreshCenterUsers();
             SettingsWindow.Show(this);
         }

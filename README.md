@@ -60,14 +60,18 @@ runtime and ship inside the zip.
 
 ### 2. First run — maps
 
-If no maps are present, the **Map Maker** opens automatically. Choose a source:
+If no maps are present, the **Map Maker** opens automatically:
 
-- **Original Maps → Download pre-built maps** — downloads a ready-to-use set.
-- **Original Maps → Generate from UO client data** — point it at your Ultima Online client
-  folder. It reads `radarcol.mul`, `mapN.mul` / `mapNLegacyMUL.uop`, `staidxN.mul` and
-  `staticsN.mul`, then writes the maps as PNGs into a `Maps/` folder next to the app.
-  (`facet0N.dds` sources are not supported yet.)
-- **Custom Maps** — add your own map entries (index, name, width, height) and generate them.
+1. Click **Browse...** and select your Ultima Online client folder. EnhancedMap scans it for
+   terrain files (`mapN.mul` / `mapNLegacyMUL.uop`) and lists every map it finds.
+2. Each entry is pre-filled with its size — detected from the file, or the standard facet
+   dimensions. Adjust the index, name, width and height if your shard uses custom sizes, and
+   remove any maps you don't want.
+3. Click **Generate**.
+
+It reads `radarcol.mul`, the terrain maps and `staidxN.mul` / `staticsN.mul`, then writes the
+maps as PNGs into a `Maps/` folder next to the app. (`facet0N.dds` sources are not supported
+yet.)
 
 Map generation can be re-run any time from the toolbar.
 
