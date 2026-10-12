@@ -48,7 +48,6 @@ namespace EnhancedMap.Core
 
         public static float Angle { get; set; } = 45;
 
-        public static PlayerObject PlayerInstance { get; private set; }
         public static UserObject TrackedUser { get; set; }
         public static BuildingObject CurrentBuildObject { get; set; }
         public static HouseObject CurrentHouseObject { get; set; }
@@ -108,7 +107,7 @@ namespace EnhancedMap.Core
             {"showhits", true},
             {"showstamina", true},
             {"showmana", true},
-            {"centerplayer", false},
+            {"centeruser", ""},
             {"trackdeathpoint", true},
             {"showhiddenicon", true},
             {"showdeathicon", true},
@@ -161,10 +160,35 @@ namespace EnhancedMap.Core
         public static event EventHandler<bool> OnFreeView;
         public static event EventHandler<OnMapChangedEventArgs> FacetChanged;
 
-        public static void CreatePlayerInstance(string name)
+        /// <summary>Display name used for outgoing chat/actions (there is no local player object).</summary>
+        public static string SelfName => SettingsCollection["username"].ToString();
+
+        /// <summary>Color used for outgoing chat/actions.</summary>
+        public static Color SelfColor => Color.FromArgb(SettingsCollection["namecolor"].ToInt());
+
+        /// <summary>
+        ///     Centers the view on the given connected user and remembers the choice so it is
+        ///     followed again on future sessions. Pass null to stop following anyone.
+        /// </summary>
+        public static void CenterOn(UserObject user)
         {
-            PlayerInstance = new PlayerObject(name) {Hue = new SolidBrush(Color.FromArgb(SettingsCollection["namecolor"].ToInt())), Font = new Font(SettingsCollection["namefont"].ToString(), SettingsCollection["namesize"].ToInt(), (FontStyle) SettingsCollection["namestyle"].ToInt(), GraphicsUnit.Pixel), Map = (byte) FirstValidFacet};
-            RenderObjectsManager.AddUser(PlayerInstance);
+            FreeView = false;
+            TrackedUser = user;
+            SettingsCollection["centeruser"] = user?.Name ?? string.Empty;
+        }
+
+        /// <summary>Re-applies the remembered center user once it connects.</summary>
+        public static void TryAutoCenter(UserObject user)
+        {
+            if (user == null)
+                return;
+
+            string remembered = SettingsCollection["centeruser"]?.ToString();
+            if (!string.IsNullOrEmpty(remembered) && string.Equals(remembered, user.Name, StringComparison.OrdinalIgnoreCase))
+            {
+                TrackedUser = user;
+                FreeView = false;
+            }
         }
 
 

@@ -44,25 +44,6 @@ namespace EnhancedMap.Core.MapObjects
             relativeX = gameX + x;
             relativeY = gameY + y;
 
-            if (Parent is PlayerObject && Global.SettingsCollection["trackdeathpoint"].ToBool())
-            {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-
-                int playerX = Global.PlayerInstance.RelativePosition.X;
-                int playerY = Global.PlayerInstance.RelativePosition.Y;
-
-                (playerX, playerY) = Geometry.RotatePoint(playerX, playerY, Global.Zoom, 1, Global.Angle);
-                AdjustPosition(playerX, playerY, x - 4, y - 4, out int plRelX, out int plRelY);
-
-                playerX = plRelX;
-                playerY = plRelY;
-                plRelX = playerX + x;
-                plRelY = playerY + x;
-
-                g.DrawLine(Pens.White, x + gameX, y + gameY, x + playerX, y + playerY);
-                g.ResetTransform();
-            }
-
             bool result = false;
 
             if (!IsEndOfLife || Parent.IsDead)

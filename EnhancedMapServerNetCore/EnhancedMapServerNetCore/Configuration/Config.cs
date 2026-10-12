@@ -34,6 +34,7 @@ namespace EnhancedMapServerNetCore.Configuration
 
             MaxSimultaneConnections = Convert.ToUInt16(Utility.GetText(set["maxsimultaneconnections"], "10"));
             MaxActiveConnections = Convert.ToUInt16(Utility.GetText(set["maxactiveconnections"], "1000"));
+            AutoCreateAccounts = Convert.ToBoolean(Utility.GetText(set["autocreateaccounts"], "false"));
         }
 
 
@@ -42,6 +43,7 @@ namespace EnhancedMapServerNetCore.Configuration
         public CREDENTIAL_SYSTEM CredentialsSystem { get; set; }
         public ushort MaxSimultaneConnections { get; set; } = 10;
         public ushort MaxActiveConnections { get; set; } = 1000;
+        public bool AutoCreateAccounts { get; set; }
 
 
         public void Save(XmlWriter writer)
@@ -53,6 +55,7 @@ namespace EnhancedMapServerNetCore.Configuration
             writer.WriteElementString("credentialssystem", ((int) CredentialsSystem).ToString());
             writer.WriteElementString("maxsimultaneconnections", MaxSimultaneConnections.ToString());
             writer.WriteElementString("maxactiveconnections", MaxActiveConnections.ToString());
+            writer.WriteElementString("autocreateaccounts", AutoCreateAccounts.ToString());
 
             writer.WriteEndElement();
         }

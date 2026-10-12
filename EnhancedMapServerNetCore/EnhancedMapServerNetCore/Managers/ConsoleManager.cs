@@ -29,6 +29,7 @@ namespace EnhancedMapServerNetCore.Managers
     - /enableuser         Remove ban status
     - /getport            Get the current server port
     - /setport            Set the server port
+    - /settings           List, get or set server settings (e.g. /settings autocreateaccounts true)
     - /setkicktime        Set after how many seconds an user can relog
     - /sendmsg            Send a game message to all users
     - /setprivileges      Set account privileges
@@ -51,7 +52,18 @@ namespace EnhancedMapServerNetCore.Managers
             {
                 input = input.ToLower().Remove(0, 1);
 
-                switch (input)
+                // Allow inline arguments, e.g. "/settings autocreateaccounts true".
+                string command = input;
+                string[] inlineArgs = Array.Empty<string>();
+                int space = input.IndexOf(' ');
+
+                if (space >= 0)
+                {
+                    command = input.Substring(0, space);
+                    inlineArgs = input.Substring(space + 1).Split(new[] {' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
+                }
+
+                switch (command)
                 {
                     case "help":
                     default:
@@ -63,13 +75,17 @@ namespace EnhancedMapServerNetCore.Managers
                         SaveManager.Save();
                         break;
 
+                    case "settings":
+                        CommandManager.ExecuteFromConsole("settings", inlineArgs);
+                        break;
+
                     case "allusersonline":
                     case "getroompassword":
                     case "getport":
                     case "statistics":
                     case "allusers":
                     case "allrooms":
-                        CommandManager.ExecuteFromConsole(input);
+                        CommandManager.ExecuteFromConsole(command);
                         break;
 
                     case "adduser":
@@ -99,7 +115,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args[3] = result;
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
                     case "removeuser":
                         Console.Write("Username: ");
@@ -108,7 +124,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args = new string[1] {result};
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "setroompassword":
@@ -130,7 +146,7 @@ namespace EnhancedMapServerNetCore.Managers
                             args[1] = result;
                         }
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "allusersinroom":
@@ -141,7 +157,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args = new string[1] {result};
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "kick":
@@ -154,7 +170,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args = new string[1] {result};
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "setkicktime":
@@ -164,7 +180,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args = new string[1] {result};
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "setpassword":
@@ -182,7 +198,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args[1] = result;
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
                     case "setroom":
                         args = new string[2];
@@ -199,7 +215,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args[1] = result;
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
 
                     case "setport":
@@ -226,7 +242,7 @@ namespace EnhancedMapServerNetCore.Managers
                         while (string.IsNullOrEmpty(result))
                             result = Console.ReadLine().Trim();
                         args = new string[1] {result};
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
                     case "setprivileges":
                         args = new string[2];
@@ -243,7 +259,7 @@ namespace EnhancedMapServerNetCore.Managers
                             result = Console.ReadLine().Trim();
                         args[1] = result;
 
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
                         break;
                     case "setloginsys":
 
@@ -256,7 +272,7 @@ namespace EnhancedMapServerNetCore.Managers
                         while (string.IsNullOrEmpty(result))
                             result = Console.ReadLine().Trim();
                         args = new string[1] { result };
-                        CommandManager.ExecuteFromConsole(input, args);
+                        CommandManager.ExecuteFromConsole(command, args);
 
                         break;
                 }

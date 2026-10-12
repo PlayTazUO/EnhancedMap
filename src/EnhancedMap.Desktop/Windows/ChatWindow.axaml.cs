@@ -50,11 +50,7 @@ namespace EnhancedMap.Desktop.Windows
             Dispatcher.UIThread.Post(() =>
             {
                 UserObject user = RenderObjectsManager.GetUser(e.Name);
-                if (user == null)
-                {
-                    Logger.Error("[CHAT] User '" + e.Name + "' not found");
-                    return;
-                }
+                EnhancedMap.Drawing.Color color = user != null ? user.Hue.Color : Global.SelfColor;
 
                 var msg = string.Format("[{0}] {1}:   {2}", e.Time.ToString("HH:mm"), e.Name, e.Message);
                 _lastChatEntry = e;
@@ -66,7 +62,7 @@ namespace EnhancedMap.Desktop.Windows
                 {
                     Text = msg,
                     TextWrapping = TextWrapping.Wrap,
-                    Foreground = ToBrush(user.Hue.Color)
+                    Foreground = ToBrush(color)
                 };
                 Messages.Children.Add(block);
                 Scroller.ScrollToEnd();
@@ -89,7 +85,7 @@ namespace EnhancedMap.Desktop.Windows
                 if (NetworkManager.SocketClient.IsConnected)
                 {
                     string t = InputBox.Text.TrimEnd();
-                    NetworkManager.SocketClient.Send(new PChatMessage(t, Global.PlayerInstance.Hue.Color));
+                    NetworkManager.SocketClient.Send(new PChatMessage(t, Global.SelfColor));
                 }
 
                 InputBox.Text = string.Empty;

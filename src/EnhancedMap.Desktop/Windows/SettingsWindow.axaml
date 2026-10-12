@@ -48,7 +48,10 @@
             <CheckBox Name="CheckShowHits" Content="Show hits bar" />
             <CheckBox Name="CheckShowStamina" Content="Show stamina bar" />
             <CheckBox Name="CheckShowMana" Content="Show mana bar" />
-            <CheckBox Name="CheckCenterPlayer" Content="Center on player" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="Center on user:" VerticalAlignment="Center" />
+              <ComboBox Name="ComboCenterUser" Width="130" SelectionChanged="OnCenterUserChanged" />
+            </StackPanel>
             <CheckBox Name="CheckTrackDeathPoint" Content="Track death points" />
             <CheckBox Name="CheckShowHiddenIcon" Content="Show hidden icon" />
             <CheckBox Name="CheckShowDeathIcon" Content="Show death icon" />

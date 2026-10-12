@@ -46,9 +46,6 @@ namespace EnhancedMap.Desktop.Controls
         /// <summary>Raised when the user requests a signal (Ctrl+G).</summary>
         public event Action SignalRequested;
 
-        /// <summary>Raised when the user toggles panic (space).</summary>
-        public event Action PanicRequested;
-
         /// <summary>Raised when a printable character is typed; the host forwards it to chat.</summary>
         public event Action<string> TextTyped;
 
@@ -196,10 +193,6 @@ namespace EnhancedMap.Desktop.Controls
         {
             switch (e.Key)
             {
-                case Key.Space:
-                    PanicRequested?.Invoke();
-                    e.Handled = true;
-                    break;
                 case Key.G when e.KeyModifiers.HasFlag(KeyModifiers.Control):
                     SignalRequested?.Invoke();
                     e.Handled = true;

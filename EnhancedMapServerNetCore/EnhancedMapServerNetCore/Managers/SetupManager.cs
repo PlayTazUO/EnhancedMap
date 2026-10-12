@@ -46,10 +46,15 @@ namespace EnhancedMapServerNetCore.Managers
                 return;
             }
 
-            Log.Message(LogTypes.None, "");
-            Log.Message(LogTypes.None, "Some configuration files are missing. Please answer the following questions.");
-            Log.Message(LogTypes.None, "Press Enter to accept the default shown between [ ].");
-            Log.Message(LogTypes.None, "");
+            // The logger writes on a background thread. Drain it so the startup banner is
+            // fully printed before we ask anything - otherwise the first question is queued
+            // behind the banner and it looks like an extra Enter is required.
+            Log.Flush();
+
+            Console.WriteLine();
+            Console.WriteLine("Some configuration files are missing. Please answer the following questions.");
+            Console.WriteLine("Press Enter to accept the default shown between [ ].");
+            Console.WriteLine();
 
             if (serverMissing)
                 SetupServer();
@@ -68,16 +73,16 @@ namespace EnhancedMapServerNetCore.Managers
             if (accountsMissing)
                 AccountManager.Save();
 
-            Log.Message(LogTypes.None, "");
-            Log.Message(LogTypes.None, "Configuration saved. Starting server...");
-            Log.Message(LogTypes.None, "");
+            Console.WriteLine();
+            Console.WriteLine("Configuration saved. Starting server...");
+            Console.WriteLine();
         }
 
         private static void SetupServer()
         {
             Config config = SettingsManager.Configuration;
 
-            Log.Message(LogTypes.None, "-- Server settings --");
+            Console.WriteLine("-- Server settings --");
 
             config.Port = ReadUShort("Server port", config.Port, IPEndPoint.MinPort, IPEndPoint.MaxPort);
             config.KickTimer = ReadUInt("Kick timer in seconds", config.KickTimer, 1);
@@ -88,13 +93,15 @@ namespace EnhancedMapServerNetCore.Managers
                 "Max simultaneous connections per user", config.MaxSimultaneConnections, 1, ushort.MaxValue);
             config.MaxActiveConnections = ReadUShort(
                 "Max active connections", config.MaxActiveConnections, 1, ushort.MaxValue);
+            config.AutoCreateAccounts = ReadBool(
+                "Auto-create accounts on first connect", config.AutoCreateAccounts);
 
-            Log.Message(LogTypes.None, "");
+            Console.WriteLine();
         }
 
         private static string SetupRooms(string defaultRoom)
         {
-            Log.Message(LogTypes.None, "-- Room settings --");
+            Console.WriteLine("-- Room settings --");
 
             string name = ReadString("Room name", defaultRoom ?? "General");
 
@@ -109,14 +116,14 @@ namespace EnhancedMapServerNetCore.Managers
             else
                 existing.Password = password;
 
-            Log.Message(LogTypes.None, "");
+            Console.WriteLine();
             return name;
         }
 
         private static void SetupAccount(string defaultRoom)
         {
-            Log.Message(LogTypes.None, "-- Administrator account --");
-            Log.Message(LogTypes.None, "At least one account is required to connect to the server.");
+            Console.WriteLine("-- Administrator account --");
+            Console.WriteLine("At least one account is required to connect to the server.");
 
             string username = ReadUsername();
             string password = ReadPassword();
@@ -126,13 +133,13 @@ namespace EnhancedMapServerNetCore.Managers
 
             if (RoomManager.Get(room) == null)
             {
-                Log.Message(LogTypes.Warning, $"Room '{room}' not found. Using '{defaultRoom ?? "General"}'.");
+                Console.WriteLine($"Warning: room '{room}' not found. Using '{defaultRoom ?? "General"}'.");
                 room = defaultRoom ?? "General";
             }
 
             AccountManager.Add(username, password, room, (ACCOUNT_LEVEL) level);
 
-            Log.Message(LogTypes.None, "");
+            Console.WriteLine();
         }
 
         private static string ReadUsername()
@@ -208,6 +215,35 @@ namespace EnhancedMapServerNetCore.Managers
                     return value;
 
                 Console.WriteLine($"Please enter a number greater than or equal to {min}.");
+            }
+        }
+
+        private static bool ReadBool(string label, bool defaultValue)
+        {
+            while (true)
+            {
+                Console.Write($"{label} (y/n) [{(defaultValue ? "y" : "n")}]: ");
+                string input = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(input))
+                    return defaultValue;
+
+                switch (input.Trim().ToLower())
+                {
+                    case "y":
+                    case "yes":
+                    case "true":
+                    case "1":
+                        return true;
+                    case "n":
+                    case "no":
+                    case "false":
+                    case "0":
+                        return false;
+                    default:
+                        Console.WriteLine("Please answer 'y' or 'n'.");
+                        break;
+                }
             }
         }
     }

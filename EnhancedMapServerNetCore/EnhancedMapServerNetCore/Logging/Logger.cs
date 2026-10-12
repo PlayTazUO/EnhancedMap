@@ -13,6 +13,7 @@ namespace EnhancedMapServerNetCore.Logging
 
         private readonly BlockingCollection<Tuple<LogTypes, string, string>> logQueue;
         private bool isLogging;
+        private int pending;
 
         public Logger()
         {
@@ -45,13 +46,13 @@ namespace EnhancedMapServerNetCore.Logging
 
         public void Start(LogFile logFile = null)
         {
+            isLogging = true;
+
             var logThread = new Thread(async () =>
             {
                 using (logQueue)
                 using (logFile)
                 {
-                    isLogging = true;
-
                     while (isLogging)
                     {
                         Thread.Sleep(1);
@@ -60,45 +61,62 @@ namespace EnhancedMapServerNetCore.Logging
                         if (LogTypes == LogTypes.None || !logQueue.TryTake(out Tuple<LogTypes, string, string> log))
                             continue;
 
-                        if (log.Item1 == LogTypes.Table)
+                        try
                         {
-                            Console.WriteLine(string.Format(log.Item3));
-                            continue;
-                        }
-
-                        // LogTypes.None is also used for empty/simple log lines (without timestamp, etc.).
-                        if (log.Item1 != LogTypes.None)
-                        {
-                            if (!Core.HeadLess)
+                            if (log.Item1 == LogTypes.Table)
                             {
-                                Console.ForegroundColor = ConsoleColor.White;
-
-                                Console.Write($"{log.Item2} |");
-
-                                Console.ForegroundColor = LogTypeInfo[log.Item1].Item1;
-                                Console.Write(LogTypeInfo[log.Item1].Item2);
-                                Console.ForegroundColor = ConsoleColor.White;
-
-                                Console.WriteLine($"| {log.Item3}");
+                                Console.WriteLine(string.Format(log.Item3));
+                                continue;
                             }
 
-                            if (logFile != null)
-                                await logFile.WriteAsync($"{log.Item2} |{LogTypeInfo[log.Item1].Item2}| {log.Item3}");
-                        }
-                        else
-                        {
-                            if (!Core.HeadLess)
-                                Console.WriteLine(log.Item3);
+                            // LogTypes.None is also used for empty/simple log lines (without timestamp, etc.).
+                            if (log.Item1 != LogTypes.None)
+                            {
+                                if (!Core.HeadLess)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.White;
 
-                            if (logFile != null)
-                                await logFile.WriteAsync(log.Item3);
+                                    Console.Write($"{log.Item2} |");
+
+                                    Console.ForegroundColor = LogTypeInfo[log.Item1].Item1;
+                                    Console.Write(LogTypeInfo[log.Item1].Item2);
+                                    Console.ForegroundColor = ConsoleColor.White;
+
+                                    Console.WriteLine($"| {log.Item3}");
+                                }
+
+                                if (logFile != null)
+                                    await logFile.WriteAsync($"{log.Item2} |{LogTypeInfo[log.Item1].Item2}| {log.Item3}");
+                            }
+                            else
+                            {
+                                if (!Core.HeadLess)
+                                    Console.WriteLine(log.Item3);
+
+                                if (logFile != null)
+                                    await logFile.WriteAsync(log.Item3);
+                            }
+                        }
+                        finally
+                        {
+                            Interlocked.Decrement(ref pending);
                         }
                     }
                 }
             }) {IsBackground = true};
             logThread.Start();
+        }
 
-            isLogging = logThread.ThreadState == ThreadState.Running || logThread.ThreadState == ThreadState.Background;
+        /// <summary>Blocks until every message queued so far has been written to the console.</summary>
+        public void Flush()
+        {
+            if (!isLogging || LogTypes == LogTypes.None)
+                return;
+
+            var spinner = new SpinWait();
+
+            while (Volatile.Read(ref pending) > 0)
+                spinner.SpinOnce();
         }
 
         public void Stop()
@@ -130,6 +148,8 @@ namespace EnhancedMapServerNetCore.Logging
         {
             if ((LogTypes & type) == type)
             {
+                Interlocked.Increment(ref pending);
+
                 if (type == LogTypes.None)
                     logQueue.Add(Tuple.Create(type, "", text));
                 else

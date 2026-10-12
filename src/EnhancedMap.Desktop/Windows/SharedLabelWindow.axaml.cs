@@ -41,7 +41,7 @@ namespace EnhancedMap.Desktop.Windows
             if (NetworkManager.SocketClient.IsConnected)
             {
                 NetworkManager.SocketClient.Send(new PSharedLabel((ushort) x, (ushort) y, map, DescriptionBox.Text));
-                RenderObjectsManager.AddSharedLabel(new SharedLabelObject(Global.PlayerInstance, x, y, map, DescriptionBox.Text));
+                RenderObjectsManager.AddSharedLabel(new SharedLabelObject(null, x, y, map, DescriptionBox.Text));
             }
         }
     }

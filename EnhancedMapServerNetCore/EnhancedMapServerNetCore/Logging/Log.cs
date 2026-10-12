@@ -43,6 +43,12 @@
             logger.WaitForKey();
         }
 
+        /// <summary>Blocks until every queued log message has been written to the console.</summary>
+        public static void Flush()
+        {
+            logger?.Flush();
+        }
+
         public static void Clear()
         {
             logger.Clear();

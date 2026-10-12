@@ -14,15 +14,6 @@ namespace EnhancedMap.Core
         private static Dictionary<string, Action<string, string, string, string, string, string, string, string, string>> _commands { get; } = new Dictionary<string, Action<string, string, string, string, string, string, string, string, string>>
         {
             {
-                "panic", (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
-                {
-                    Global.PlayerInstance.InPanic = true;
-                    if (Global.SettingsCollection["panicsounds"].ToBool())
-                        SoundsManager.Play(SOUNDS_TYPE.PANIC);
-                }
-            },
-            {"unpanic", (a1, a2, a3, a4, a5, a6, a7, a8, a9) => { Global.PlayerInstance.InPanic = false; }},
-            {
                 "goto", (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
                 {
                     if (!Global.FreeView)
@@ -60,7 +51,7 @@ namespace EnhancedMap.Core
                     {
                         UserObject u = RenderObjectsManager.GetUser(a1);
                         if (u != null && !u.IsDisposing)
-                            Global.TrackedUser = u is PlayerObject ? null : u;
+                            Global.CenterOn(u);
                     }
                 }
             },
@@ -80,7 +71,7 @@ namespace EnhancedMap.Core
                 "addmarker", (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
                 {
                     if (short.TryParse(a1, out short x) && short.TryParse(a2, out short y))
-                        RenderObjectsManager.AddMarkerObject(new MarkerObject(Global.PlayerInstance, x, y));
+                        RenderObjectsManager.AddMarkerObject(new MarkerObject(null, x, y));
                 }
             }
             /* {
@@ -137,7 +128,7 @@ namespace EnhancedMap.Core
                 }
                 else
                 {
-                    if (NetworkManager.SocketClient.IsConnected) NetworkManager.SocketClient.Send(new PChatMessage(text, Global.PlayerInstance.Hue.Color));
+                    if (NetworkManager.SocketClient.IsConnected) NetworkManager.SocketClient.Send(new PChatMessage(text, Global.SelfColor));
                 }
             }
             else

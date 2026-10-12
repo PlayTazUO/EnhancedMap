@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using EnhancedMap.Core;
@@ -23,6 +24,8 @@ namespace EnhancedMap.Desktop
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+
                 desktop.ShutdownRequested += (sender, e) =>
                 {
                     MainCore.IsRunning = false;

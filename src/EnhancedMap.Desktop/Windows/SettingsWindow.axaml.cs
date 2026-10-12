@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using EnhancedMap.Core;
+using EnhancedMap.Core.MapObjects;
 using EnhancedMap.Core.Network;
 using EnhancedMap.Diagnostic;
 
@@ -43,6 +44,15 @@ namespace EnhancedMap.Desktop.Windows
         }
 
         public void ApplyFps() { }
+
+        /// <summary>
+        ///     Copies the current control values into <see cref="Global.SettingsCollection" /> without
+        ///     writing to disk. Used so connecting from the main menu honors unsaved edits.
+        /// </summary>
+        public void ApplySettings()
+        {
+            ApplyToCollection();
+        }
 
         // ---------------------------------------------------------------- load
 
@@ -87,7 +97,6 @@ namespace EnhancedMap.Desktop.Windows
                     CheckShowHits.IsChecked = GetBool(general, "showhits");
                     CheckShowStamina.IsChecked = GetBool(general, "showstamina");
                     CheckShowMana.IsChecked = GetBool(general, "showmana");
-                    CheckCenterPlayer.IsChecked = GetBool(general, "centerplayer");
                     CheckTrackDeathPoint.IsChecked = GetBool(general, "trackdeathpoint");
                     CheckShowHiddenIcon.IsChecked = GetBool(general, "showhiddenicon");
                     CheckShowDeathIcon.IsChecked = GetBool(general, "showdeathicon");
@@ -104,6 +113,7 @@ namespace EnhancedMap.Desktop.Windows
                     CheckShowHouses.IsChecked = GetBool(general, "showhouses");
                     CheckShowMobilesAround.IsChecked = GetBool(general, "showmobilesaroundyou");
                     CheckDontRenderUsersDiffFacet.IsChecked = GetBool(general, "dontrenderusersindifferentfacets");
+                    Global.SettingsCollection["centeruser"] = general.ToText("centeruser", Global.SettingsCollection["centeruser"].ToString());
                 }
 
                 XmlElement application = root["application"];
@@ -134,7 +144,60 @@ namespace EnhancedMap.Desktop.Windows
                 LoadDefaults();
             }
 
+            ApplyToCollection();
+
+            RefreshCenterUsers();
+
             _loaded = true;
+        }
+
+        // ---------------------------------------------------------------- center on user
+
+        private const string CenterNone = "(none)";
+        private bool _loadingCenter;
+
+        /// <summary>
+        ///     Rebuilds the center-on-user list from currently connected users. Keeps the
+        ///     remembered selection even if that user is offline so it auto-follows on reconnect.
+        /// </summary>
+        public void RefreshCenterUsers()
+        {
+            _loadingCenter = true;
+
+            string current = Global.SettingsCollection["centeruser"]?.ToString() ?? string.Empty;
+
+            ComboCenterUser.Items.Clear();
+            ComboCenterUser.Items.Add(CenterNone);
+
+            var names = RenderObjectsManager.Get<UserObject>().Where(u => u != null && !u.IsDisposing).Select(u => u.Name).Distinct().ToList();
+
+            if (!string.IsNullOrEmpty(current) && !names.Contains(current))
+                names.Add(current);
+
+            foreach (string name in names)
+                ComboCenterUser.Items.Add(name);
+
+            ComboCenterUser.SelectedItem = string.IsNullOrEmpty(current) ? CenterNone : current;
+
+            _loadingCenter = false;
+        }
+
+        private void OnCenterUserChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_loadingCenter || !(ComboCenterUser.SelectedItem is string name))
+                return;
+
+            if (name == CenterNone)
+            {
+                Global.CenterOn(null);
+                return;
+            }
+
+            UserObject user = RenderObjectsManager.GetUser(name);
+            if (user != null)
+                Global.CenterOn(user);
+            else
+                Global.SettingsCollection["centeruser"] = name;
         }
 
         private void LoadDefaults()
@@ -153,7 +216,6 @@ namespace EnhancedMap.Desktop.Windows
             CheckShowHits.IsChecked = s["showhits"].ToBool();
             CheckShowStamina.IsChecked = s["showstamina"].ToBool();
             CheckShowMana.IsChecked = s["showmana"].ToBool();
-            CheckCenterPlayer.IsChecked = s["centerplayer"].ToBool();
             CheckTrackDeathPoint.IsChecked = s["trackdeathpoint"].ToBool();
             CheckShowHiddenIcon.IsChecked = s["showhiddenicon"].ToBool();
             CheckShowDeathIcon.IsChecked = s["showdeathicon"].ToBool();
@@ -213,7 +275,7 @@ namespace EnhancedMap.Desktop.Windows
                 WriteCheck(xml, "showhits", CheckShowHits);
                 WriteCheck(xml, "showstamina", CheckShowStamina);
                 WriteCheck(xml, "showmana", CheckShowMana);
-                WriteCheck(xml, "centerplayer", CheckCenterPlayer);
+                xml.WriteAttributeString("centeruser", Global.SettingsCollection["centeruser"]?.ToString() ?? string.Empty);
                 WriteCheck(xml, "trackdeathpoint", CheckTrackDeathPoint);
                 WriteCheck(xml, "showhiddenicon", CheckShowHiddenIcon);
                 WriteCheck(xml, "showdeathicon", CheckShowDeathIcon);
@@ -272,7 +334,6 @@ namespace EnhancedMap.Desktop.Windows
             s["showhits"] = CheckShowHits.IsChecked == true;
             s["showstamina"] = CheckShowStamina.IsChecked == true;
             s["showmana"] = CheckShowMana.IsChecked == true;
-            s["centerplayer"] = CheckCenterPlayer.IsChecked == true;
             s["trackdeathpoint"] = CheckTrackDeathPoint.IsChecked == true;
             s["showhiddenicon"] = CheckShowHiddenIcon.IsChecked == true;
             s["showdeathicon"] = CheckShowDeathIcon.IsChecked == true;

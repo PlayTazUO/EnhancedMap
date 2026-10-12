@@ -35,12 +35,7 @@ namespace EnhancedMap.Core
             {
                 UserObject[] users = Get<UserObject>();
                 for (int i = 0; i < users.Length; i++)
-                {
-                    UserObject user = users[i];
-                    if (user is PlayerObject)
-                        continue;
-                    user.Dispose();
-                }
+                    users[i].Dispose();
             };
         }
 
@@ -53,6 +48,7 @@ namespace EnhancedMap.Core
         public static void AddUser(UserObject obj)
         {
             _objects[(int) LAYER_ORDER.USERS].Add(obj);
+            Global.TryAutoCenter(obj);
         }
 
         public static void AddMobile(MobileObject obj)
@@ -190,7 +186,7 @@ namespace EnhancedMap.Core
              return list;*/
 
 
-            if (typeof(T) == typeof(PlayerObject) || typeof(T) == typeof(UserObject))
+            if (typeof(T) == typeof(UserObject))
                 return _objects[(int) LAYER_ORDER.USERS].Where(s => s is T).Cast<T>().ToArray();
             if (typeof(T) == typeof(MobileObject))
                 return _objects[(int) LAYER_ORDER.MOBILES].Where(s => s is T).Cast<T>().ToArray();

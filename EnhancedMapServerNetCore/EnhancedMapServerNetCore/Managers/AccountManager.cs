@@ -84,6 +84,42 @@ namespace EnhancedMapServerNetCore.Managers
                 Log.Message(LogTypes.Panic, $"Account '{name}' not exists");
         }
 
+        /// <summary>
+        ///     Creates a normal account (in the default "General" room) on the fly when
+        ///     <see cref="Configuration.Config.AutoCreateAccounts" /> is enabled.
+        /// </summary>
+        private static bool TryAutoCreate(string username, string password, out Account account)
+        {
+            account = null;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                Log.Message(LogTypes.Trace, "Cannot auto-create account without a username.");
+                return false;
+            }
+
+            Room room = RoomManager.Get("General");
+
+            if (room == null)
+            {
+                Log.Message(LogTypes.Warning, "Cannot auto-create account: 'General' room not found.");
+                return false;
+            }
+
+            Account created = new Account(username, password, room, ACCOUNT_LEVEL.NORMAL, true);
+
+            if (_accounts.TryAdd(username, created))
+            {
+                account = created;
+                Save();
+                Log.Message(LogTypes.Info, $"Auto-created account '{username}' in room '{room.Name}'.");
+                return true;
+            }
+
+            account = Get(username);
+            return account != null;
+        }
+
 
         public static bool CanConnect(string username, string password, Session session)
         {
@@ -103,8 +139,14 @@ namespace EnhancedMapServerNetCore.Managers
             Account account = Get(username);
             if (account == null)
             {
-                Log.Message(LogTypes.Trace, $"Account '{username}' not exists");
-                return false;
+                if (!SettingsManager.Configuration.AutoCreateAccounts)
+                {
+                    Log.Message(LogTypes.Trace, $"Account '{username}' not exists");
+                    return false;
+                }
+
+                if (!TryAutoCreate(username, password, out account))
+                    return false;
             }
 
             if (!account.IsPasswordGood(password))

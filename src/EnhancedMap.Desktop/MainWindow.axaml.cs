@@ -40,7 +40,6 @@ namespace EnhancedMap.Desktop
 #endif
 
             Map.SignalRequested += SendSignal;
-            Map.PanicRequested += () => CommandManager.DoCommand((Global.PlayerInstance?.InPanic ?? false ? "un" : "") + "panic");
             Map.TextTyped += OnTextTyped;
 
             BuildContextMenu();
@@ -112,8 +111,6 @@ namespace EnhancedMap.Desktop
             {
                 // houses xml optional
             }
-
-            Global.CreatePlayerInstance(Global.SettingsCollection["username"].ToString());
 
             RenderObjectsManager.AddLabel(Global.CurrentLabelObject);
             RenderObjectsManager.AddMask(RoseMask.RoseInstance);
@@ -234,41 +231,25 @@ namespace EnhancedMap.Desktop
 
         private bool UpdatePosition()
         {
-            if (Global.PlayerInstance == null)
+            if (Global.FreeView || Global.TrackedUser == null || Global.TrackedUser.IsDisposing)
                 return false;
 
-            bool ok = Global.PlayerInstance.Update();
+            bool ok = false;
 
-            if (Global.TrackedUser == null && !Global.FreeView)
+            if (Global.X != Global.TrackedUser.Position.X)
             {
-                if (Global.PlayerInstance.InGame)
-                {
-                    if (Global.X != Global.PlayerInstance.Position.X)
-                        Global.X = Global.PlayerInstance.Position.X;
-                    if (Global.Y != Global.PlayerInstance.Position.Y)
-                        Global.Y = Global.PlayerInstance.Position.Y;
-
-                    if (!Global.IsFacetChanged && Global.Facet != Global.PlayerInstance.Map)
-                        Global.Facet = Global.PlayerInstance.Map;
-                }
+                Global.X = Global.TrackedUser.Position.X;
+                ok = true;
             }
-            else if (!Global.FreeView && Global.TrackedUser != null)
+
+            if (Global.Y != Global.TrackedUser.Position.Y)
             {
-                if (Global.X != Global.TrackedUser.Position.X)
-                {
-                    Global.X = Global.TrackedUser.Position.X;
-                    ok = true;
-                }
-
-                if (Global.Y != Global.TrackedUser.Position.Y)
-                {
-                    Global.Y = Global.TrackedUser.Position.Y;
-                    ok = true;
-                }
-
-                if (!Global.IsFacetChanged && Global.Facet != Global.TrackedUser.Map)
-                    Global.Facet = Global.TrackedUser.Map;
+                Global.Y = Global.TrackedUser.Position.Y;
+                ok = true;
             }
+
+            if (!Global.IsFacetChanged && Global.Facet != Global.TrackedUser.Map)
+                Global.Facet = Global.TrackedUser.Map;
 
             return ok;
         }
@@ -331,9 +312,7 @@ namespace EnhancedMap.Desktop
                 var captured = user;
                 track.Click += (s, args) =>
                 {
-                    if (Global.FreeView)
-                        Global.FreeView = false;
-                    Global.TrackedUser = captured is PlayerObject ? null : captured;
+                    Global.CenterOn(captured);
                     _requestRefresh = true;
                 };
                 var highlight = new MenuItem {Header = "Highlight", IsChecked = user.IsHighlighted};
@@ -356,7 +335,7 @@ namespace EnhancedMap.Desktop
             var addLocal = new MenuItem {Header = "Add local"};
             addLocal.Click += (s, args) =>
             {
-                RenderObjectsManager.AddMarkerObject(new MarkerObject(Global.PlayerInstance, MouseManager.Location.X, MouseManager.Location.Y));
+                RenderObjectsManager.AddMarkerObject(new MarkerObject(null, MouseManager.Location.X, MouseManager.Location.Y));
                 _requestRefresh = true;
             };
             var addShared = new MenuItem {Header = "Add shared"};
@@ -371,7 +350,8 @@ namespace EnhancedMap.Desktop
             foreach (MarkerObject mark in RenderObjectsManager.Get<MarkerObject>())
             {
                 var captured = mark;
-                var m = new MenuItem {Header = $"{captured.Parent?.Name}'s marker"};
+                string owner = captured.Parent?.Name;
+                var m = new MenuItem {Header = string.IsNullOrEmpty(owner) ? $"Marker ({captured.Position.X}, {captured.Position.Y})" : $"{owner}'s marker"};
                 var remove = new MenuItem {Header = "Remove"};
                 remove.Click += (s, args) => captured.Dispose();
                 m.Items.Add(remove);
@@ -381,11 +361,8 @@ namespace EnhancedMap.Desktop
             menu.Items.Add(markers);
 
             var signals = new MenuItem {Header = "Signals"};
-            var panic = new MenuItem {Header = "Send panic!"};
-            panic.Click += (s, args) => CommandManager.DoCommand((Global.PlayerInstance?.InPanic ?? false ? "un" : "") + "panic");
             var alert = new MenuItem {Header = "Send alert"};
             alert.Click += (s, args) => SendSignal();
-            signals.Items.Add(panic);
             signals.Items.Add(alert);
             menu.Items.Add(signals);
 
@@ -421,7 +398,7 @@ namespace EnhancedMap.Desktop
                 item.Click += (s, args) =>
                 {
                     Global.Facet = captured.Index;
-                    Global.IsFacetChanged = Global.PlayerInstance.Map != Global.Facet;
+                    Global.IsFacetChanged = true;
                     _requestRefresh = true;
                 };
                 maps.Items.Add(item);
@@ -449,7 +426,10 @@ namespace EnhancedMap.Desktop
             if (NetworkManager.SocketClient.IsConnected)
                 NetworkManager.Disconnect(false);
             else
+            {
+                SettingsWindow.ApplySettings();
                 NetworkManager.Connect();
+            }
         }
 
         private void OnFlipClick(object sender, RoutedEventArgs e)
@@ -536,6 +516,7 @@ namespace EnhancedMap.Desktop
 
         private void OnSettingsClick(object sender, RoutedEventArgs e)
         {
+            SettingsWindow.RefreshCenterUsers();
             SettingsWindow.Show(this);
         }
 

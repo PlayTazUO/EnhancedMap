@@ -19,7 +19,7 @@ namespace EnhancedMap.Core.MapObjects
 
         public override bool Render(Graphics g, int x, int y, int canvasW, int canvasH)
         {
-            if (Parent == null || Parent.IsDisposing)
+            if (Parent != null && Parent.IsDisposing)
                 Dispose();
 
             if (IsDisposing || Global.Facet != Map)

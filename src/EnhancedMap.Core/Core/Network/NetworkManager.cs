@@ -23,7 +23,7 @@ namespace EnhancedMap.Core.Network
 
             SocketClient.Disconnected += (sender, e) =>
             {
-                RenderObjectsManager.Get<UserObject>().Where(s => !(s is PlayerObject)).ToList().ForEach(s => s.Dispose());
+                RenderObjectsManager.Get<UserObject>().ToList().ForEach(s => s.Dispose());
                 RenderObjectsManager.Get<SharedLabelObject>().ToList().ForEach(s => s.Dispose());
             };
 

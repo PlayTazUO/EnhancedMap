@@ -125,9 +125,6 @@ namespace EnhancedMap.Core.Network
         {
             HandleReceive();
 
-            if (DateTime.Now > _updateTime && CanSend)
-                Global.PlayerInstance.SendData();
-
             Flush();
         }
 

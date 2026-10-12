@@ -90,8 +90,8 @@ namespace EnhancedMap.Core.Network
 
                     if (!string.IsNullOrEmpty(msg))
                     {
-                        UOClientManager.SysMessage("[Chat][" + Global.PlayerInstance.Name + "]: " + msg, 83);
-                        ChatManager.Add(Global.PlayerInstance.Name, msg);
+                        UOClientManager.SysMessage("[Chat][" + Global.SelfName + "]: " + msg, 83);
+                        ChatManager.Add(Global.SelfName, msg);
                     }
                 }
             }
@@ -182,7 +182,7 @@ namespace EnhancedMap.Core.Network
             string username = p.ReadASCII(p.ReadByte());
             UserObject user = RenderObjectsManager.GetUser(username);
             ChatManager.Add(username, message);
-            user.UpdateLifeTime();
+            user?.UpdateLifeTime();
             UOClientManager.SysMessage("[Chat][" + username + "]: " + message, 83);
         }
 

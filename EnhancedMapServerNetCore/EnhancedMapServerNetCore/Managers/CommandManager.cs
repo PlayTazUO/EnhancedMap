@@ -38,7 +38,8 @@ namespace EnhancedMapServerNetCore.Managers
             { "allrooms", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, AllRooms)},
             { "getport", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, GetPort)},
             { "setkicktime", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, SetKickTime)},
-            { "setmaxusersconnection", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, SetMaxUsersConnection)}
+            { "setmaxusersconnection", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, SetMaxUsersConnection)},
+            { "settings", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, Settings)}
         };
 
 
@@ -86,6 +87,160 @@ namespace EnhancedMapServerNetCore.Managers
             }
             else
                 SendTo(user, "Wrong typed number.");
+        }
+
+        /// <summary>
+        ///     Lists, gets or sets server settings.
+        ///     Usage: /settings            -> list all
+        ///            /settings &lt;key&gt;      -> get one
+        ///            /settings &lt;key&gt; &lt;val&gt; -> set one
+        /// </summary>
+        private static void Settings(User user, params string[] args)
+        {
+            Config c = SettingsManager.Configuration;
+
+            if (args.Length == 0)
+            {
+                SendTo(user, "Settings:");
+                SendTo(user, $"  port = {c.Port}");
+                SendTo(user, $"  kicktimer = {c.KickTimer}");
+                SendTo(user, $"  credentialssystem = {(int) c.CredentialsSystem} (0 = username + password, 1 = password only)");
+                SendTo(user, $"  maxsimultaneconnections = {c.MaxSimultaneConnections}");
+                SendTo(user, $"  maxactiveconnections = {c.MaxActiveConnections}");
+                SendTo(user, $"  autocreateaccounts = {c.AutoCreateAccounts}");
+                return;
+            }
+
+            string key = args[0].Trim().ToLower();
+
+            if (args.Length == 1)
+            {
+                switch (key)
+                {
+                    case "port":
+                        SendTo(user, "port = " + c.Port);
+                        break;
+                    case "kicktimer":
+                        SendTo(user, "kicktimer = " + c.KickTimer);
+                        break;
+                    case "credentialssystem":
+                        SendTo(user, "credentialssystem = " + (int) c.CredentialsSystem);
+                        break;
+                    case "maxsimultaneconnections":
+                        SendTo(user, "maxsimultaneconnections = " + c.MaxSimultaneConnections);
+                        break;
+                    case "maxactiveconnections":
+                        SendTo(user, "maxactiveconnections = " + c.MaxActiveConnections);
+                        break;
+                    case "autocreateaccounts":
+                        SendTo(user, "autocreateaccounts = " + c.AutoCreateAccounts);
+                        break;
+                    default:
+                        SendTo(user, $"Unknown setting '{key}'.");
+                        break;
+                }
+
+                return;
+            }
+
+            string value = args[1].Trim();
+
+            switch (key)
+            {
+                case "port":
+                    if (ushort.TryParse(value, out ushort port) && port is >= 1 and <= 65535)
+                    {
+                        c.Port = port;
+                        SendTo(user, $"port set to {port} (restart required).");
+                    }
+                    else
+                        SendTo(user, "Invalid port.");
+
+                    break;
+
+                case "kicktimer":
+                    if (uint.TryParse(value, out uint kick) && kick > 0)
+                    {
+                        c.KickTimer = kick;
+                        SendTo(user, "kicktimer set to " + kick + ".");
+                    }
+                    else
+                        SendTo(user, "Invalid kick timer.");
+
+                    break;
+
+                case "credentialssystem":
+                    if (int.TryParse(value, out int cred) && (cred == 0 || cred == 1))
+                    {
+                        c.CredentialsSystem = (CREDENTIAL_SYSTEM) cred;
+                        SendTo(user, "credentialssystem set to " + cred + ".");
+                    }
+                    else
+                        SendTo(user, "Invalid credentials system (0 or 1).");
+
+                    break;
+
+                case "maxsimultaneconnections":
+                    if (ushort.TryParse(value, out ushort sim) && sim >= 1)
+                    {
+                        c.MaxSimultaneConnections = sim;
+                        SendTo(user, "maxsimultaneconnections set to " + sim + ".");
+                    }
+                    else
+                        SendTo(user, "Invalid value.");
+
+                    break;
+
+                case "maxactiveconnections":
+                    if (ushort.TryParse(value, out ushort maxconn) && maxconn >= 1)
+                    {
+                        c.MaxActiveConnections = maxconn;
+                        SendTo(user, "maxactiveconnections set to " + maxconn + ".");
+                    }
+                    else
+                        SendTo(user, "Invalid value.");
+
+                    break;
+
+                case "autocreateaccounts":
+                    if (TryParseBool(value, out bool auto))
+                    {
+                        c.AutoCreateAccounts = auto;
+                        SendTo(user, "autocreateaccounts set to " + auto + ".");
+                    }
+                    else
+                        SendTo(user, "Invalid value (use true/false, yes/no, on/off or 1/0).");
+
+                    break;
+
+                default:
+                    SendTo(user, $"Unknown setting '{key}'.");
+                    return;
+            }
+
+            SettingsManager.Save();
+        }
+
+        private static bool TryParseBool(string value, out bool result)
+        {
+            switch (value.Trim().ToLower())
+            {
+                case "true":
+                case "yes":
+                case "on":
+                case "1":
+                    result = true;
+                    return true;
+                case "false":
+                case "no":
+                case "off":
+                case "0":
+                    result = false;
+                    return true;
+                default:
+                    result = false;
+                    return false;
+            }
         }
 
         private static void GetPort(User user, params string[] args)

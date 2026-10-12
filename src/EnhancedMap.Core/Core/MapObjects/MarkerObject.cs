@@ -21,7 +21,7 @@ namespace EnhancedMap.Core.MapObjects
 
         public override bool Render(Graphics g, int x, int y, int canvasW, int canvasH)
         {
-            if (Parent == null || Parent.IsDisposing)
+            if (Parent != null && Parent.IsDisposing)
                 Dispose();
 
             if (IsDisposing || Map != Global.Facet)
@@ -40,21 +40,10 @@ namespace EnhancedMap.Core.MapObjects
             relativeY = gameY + y;
 
 
-            int playerX = Global.PlayerInstance.RelativePosition.X;
-            int playerY = Global.PlayerInstance.RelativePosition.Y;
-
-            (playerX, playerY) = Geometry.RotatePoint(playerX, playerY, Global.Zoom, 1, Global.Angle);
-            // AdjustPosition(playerX, playerY, x - 4, y - 4, out int plRelX, out int plRelY);
-            // bool inwindow = playerX == plRelX && playerY == plRelY;
-
-            // playerX = plRelX; playerY = plRelY;
-
-            // if (inwindow)
-            // {
+            // With no local player the marker's line points at the view center (the reference point).
             g.SmoothingMode = SmoothingMode.AntiAlias;
-            g.DrawLine(_pen, relativeX, relativeY, x + playerX, y + playerY);
+            g.DrawLine(_pen, relativeX, relativeY, x, y);
             g.ResetTransform();
-            // }
 
             g.DrawImage(_img, relativeX - _img.Width / 2, relativeY - _img.Height, _img.Width, _img.Height);
 

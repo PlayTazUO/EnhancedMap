@@ -7,7 +7,7 @@ namespace EnhancedMap.Core.MapObjects
         public MobileObject(uint serial) : base("0x" + serial.ToString("X"))
         {
             Serial = serial;
-            Map = Global.PlayerInstance.Map;
+            Map = (byte) Global.FirstValidFacet;
         }
 
         public uint Serial { get; }
@@ -16,12 +16,6 @@ namespace EnhancedMap.Core.MapObjects
         {
             if (IsDisposing || Map != Global.Facet)
                 return false;
-
-            if (Global.PlayerInstance.Position.DistanceTo(Position) > 24)
-            {
-                Dispose();
-                return false;
-            }
 
             int gameX = RelativePosition.X;
             int gameY = RelativePosition.Y;
