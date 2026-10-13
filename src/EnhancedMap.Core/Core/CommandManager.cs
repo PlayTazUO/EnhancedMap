@@ -68,14 +68,14 @@ namespace EnhancedMap.Core
                 }
             },
             {
-                "addmarker", (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
+                "addpin", (a1, a2, a3, a4, a5, a6, a7, a8, a9) =>
                 {
                     if (short.TryParse(a1, out short x) && short.TryParse(a2, out short y))
-                        RenderObjectsManager.AddMarkerObject(new MarkerObject(null, x, y));
+                        RenderObjectsManager.AddPinObject(new PinObject(null, x, y));
                 }
             }
             /* {
-                 "removemarker", (string a1, string a2, string a3, string a4, string a5, string a6, string a7, string a8, string a9) =>
+                 "removepin", (string a1, string a2, string a3, string a4, string a5, string a6, string a7, string a8, string a9) =>
                  {
  
                  }

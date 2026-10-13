@@ -1,24 +1,34 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="EnhancedMap.Desktop.Windows.SharedLabelWindow"
-        Width="340" Height="240"
+        Width="340" Height="300"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Title="Shared Label Creator">
-  <StackPanel Margin="12" Spacing="8">
-    <StackPanel Orientation="Horizontal" Spacing="6">
-      <TextBlock Text="X:" VerticalAlignment="Center" Width="40" />
-      <TextBox Name="TextBoxX" Width="100" />
-      <TextBlock Text="Y:" VerticalAlignment="Center" Width="20" />
-      <TextBox Name="TextBoxY" Width="100" />
+  <DockPanel Margin="12">
+    <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Width="4" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="Enhanced Map — Shared Label" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
+
+    <StackPanel Spacing="8">
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <TextBlock Text="X:" VerticalAlignment="Center" Width="40" />
+        <TextBox Name="TextBoxX" Width="100" />
+        <TextBlock Text="Y:" VerticalAlignment="Center" Width="20" />
+        <TextBox Name="TextBoxY" Width="100" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="6">
+        <TextBlock Text="Map:" VerticalAlignment="Center" Width="40" />
+        <ComboBox Name="MapCombo" Width="120" />
+      </StackPanel>
+      <TextBlock Text="Description:" />
+      <TextBox Name="DescriptionBox" AcceptsReturn="True" Height="70" TextWrapping="Wrap" />
+      <Button Name="SendButton" Classes="accent" Content="Send" Width="90" HorizontalAlignment="Right" Click="OnSendClick" />
     </StackPanel>
-    <StackPanel Orientation="Horizontal" Spacing="6">
-      <TextBlock Text="Map:" VerticalAlignment="Center" Width="40" />
-      <ComboBox Name="MapCombo" Width="120" />
-    </StackPanel>
-    <TextBlock Text="Description:" />
-    <TextBox Name="DescriptionBox" AcceptsReturn="True" Height="70" TextWrapping="Wrap" />
-    <Button Name="SendButton" Content="Send" Width="90" HorizontalAlignment="Right" Click="OnSendClick" />
-  </StackPanel>
+  </DockPanel>
 </Window>

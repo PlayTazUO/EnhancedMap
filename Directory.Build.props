@@ -1,0 +1,11 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Single version shared by the desktop client, core library and server. -->
+    <Version>1.0.4</Version>
+    <!-- Keep the assembly version identical to the version string (no padding to 4 parts). -->
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
+  </PropertyGroup>
+
+</Project>

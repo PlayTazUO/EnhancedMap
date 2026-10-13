@@ -92,16 +92,10 @@ namespace EnhancedMap.Core
             {"username", "You"},
             {"password", ""},
             {"remembercredentials", true},
-#if BETA
-            { "ip", "enhancedmap.hopto.org" },
-#else
-            {"ip", ""},
-#endif
+            {"ip", "127.0.0.1"},
             {"port", 8887},
             {"rememberserver", true},
             {"autologin", false},
-            {"tryreconnect", false},
-            {"tryreconnecttime", 30},
 
             // general
             {"showhits", true},
@@ -115,42 +109,21 @@ namespace EnhancedMap.Core
             {"panicsounds", true},
             {"alertsounds", true},
             {"smartnamesposition", false},
-            {"showplacesicons", true},
             {"hidelessimportantplaces", false},
             {"showtownsnames", false},
-            {"showserverbounds", true},
             {"showguardlines", true},
             {"showcoordinates", true},
             {"showhouses", true},
-            {"showmobilesaroundyou", true},
             {"dontrenderusersindifferentfacets", false},
             {"nameposition", 0},
             {"namecolor", Color.White.ToArgb()},
-            {"namefont", "Segoe UI"},
-            {"namesize", 12},
-            {"namestyle", (int) FontStyle.Regular},
 
             // application
-            {"showscrollbarls", false},
             {"openchatatstart", false},
-            {"showincomingmsg", false},
-            {"soundsincomingmsg", true},
-            {"followuowindowstate", false},
-            {"loadmapsondemand", false},
             {"showfps", false},
             {"fps", 30},
             {"mapkind", 0},
-            {"clientpath", string.Empty},
-            {"mapX", -1},
-            {"mapY", -1},
-            {"mapW", -1},
-            {"mapH", -1},
-            {"chatX", -1},
-            {"chatY", -1},
-            {"chatW", -1},
-            {"chatH", -1},
             {"zoomIndex", 4},
-            {"chatfontsize", 10},
 
             // diagnostic
             {"autoscroll", true}

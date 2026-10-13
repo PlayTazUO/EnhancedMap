@@ -5,120 +5,6 @@
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Title="Settings">
-  <Window.Background>
-    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-      <GradientStop Color="#0F1218" Offset="0" />
-      <GradientStop Color="#1A1F2A" Offset="1" />
-    </LinearGradientBrush>
-  </Window.Background>
-
-  <Window.Resources>
-    <Color x:Key="SystemAccentColor">#E0A458</Color>
-    <SolidColorBrush x:Key="AccentBrush">#E0A458</SolidColorBrush>
-    <SolidColorBrush x:Key="AccentHoverBrush">#F0BB74</SolidColorBrush>
-    <SolidColorBrush x:Key="TextBrush">#E6E9EF</SolidColorBrush>
-    <SolidColorBrush x:Key="MutedTextBrush">#9AA3B2</SolidColorBrush>
-    <SolidColorBrush x:Key="FieldBrush">#1B202B</SolidColorBrush>
-    <SolidColorBrush x:Key="FieldBorderBrush">#39424F</SolidColorBrush>
-    <SolidColorBrush x:Key="SurfaceBrush">#20262F</SolidColorBrush>
-  </Window.Resources>
-
-  <Window.Styles>
-    <Style Selector="TextBlock">
-      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-    </Style>
-
-    <Style Selector="TabItem">
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}" />
-      <Setter Property="Padding" Value="16,7" />
-      <Setter Property="FontSize" Value="14" />
-    </Style>
-    <Style Selector="TabItem:selected">
-      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
-    </Style>
-    <Style Selector="TabItem:pointerover">
-      <Setter Property="Foreground" Value="{DynamicResource AccentHoverBrush}" />
-    </Style>
-
-    <Style Selector="Button">
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Padding" Value="14,6" />
-      <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="Button:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#2B333F" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-    </Style>
-    <Style Selector="Button:pressed /template/ ContentPresenter">
-      <Setter Property="Background" Value="#161B23" />
-    </Style>
-
-    <Style Selector="Button.accent">
-      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="Foreground" Value="#171205" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentHoverBrush}" />
-    </Style>
-    <Style Selector="Button.accent:pressed /template/ ContentPresenter">
-      <Setter Property="Background" Value="#C98F49" />
-      <Setter Property="BorderBrush" Value="#C98F49" />
-    </Style>
-
-    <Style Selector="Button.cmd">
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="HorizontalContentAlignment" Value="Left" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Padding" Value="10,6" />
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="FontWeight" Value="Normal" />
-    </Style>
-    <Style Selector="Button.cmd:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="#2B333F" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style Selector="Button.cmd.selected">
-      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-      <Setter Property="Foreground" Value="#171205" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-    <Style Selector="Button.cmd.selected:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
-      <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-
-    <Style Selector="TextBox">
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FieldBorderBrush}" />
-      <Setter Property="Padding" Value="8,6" />
-    </Style>
-    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
-      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-    </Style>
-
-    <Style Selector="ComboBox">
-      <Setter Property="CornerRadius" Value="6" />
-      <Setter Property="Background" Value="{DynamicResource FieldBrush}" />
-    </Style>
-
-    <Style Selector="NumericUpDown">
-      <Setter Property="CornerRadius" Value="6" />
-    </Style>
-
-    <Style Selector="CheckBox">
-      <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-    </Style>
-  </Window.Styles>
-
   <DockPanel Margin="12">
     <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
             Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
@@ -138,7 +24,7 @@
           <TextBlock DockPanel.Dock="Top" Name="ConnectionErrorText" Foreground="#D9534F" TextWrapping="Wrap"
                      IsVisible="False" Margin="0,0,0,8" />
           <ScrollViewer>
-            <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
+            <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Username:" VerticalAlignment="Center" ToolTip.Tip="The account name used to log in to the shard (up to 16 characters)." />
             <TextBox Grid.Row="0" Grid.Column="1" Name="TextName" MaxLength="16" ToolTip.Tip="The account name used to log in to the shard (up to 16 characters)." />
 
@@ -157,12 +43,7 @@
 
             <CheckBox Grid.Row="6" Grid.Column="1" Name="CheckAutoLogin" Content="Auto login at start" ToolTip.Tip="Automatically connect to the remembered server when Enhanced Map starts." />
 
-            <CheckBox Grid.Row="7" Grid.Column="1" Name="CheckTryReconnect" Content="Try to reconnect" ToolTip.Tip="Automatically try to reconnect if the connection to the server is lost." />
-
-            <TextBlock Grid.Row="8" Grid.Column="0" Text="Reconnect delay (ms):" VerticalAlignment="Center" ToolTip.Tip="How long to wait, in milliseconds, between reconnect attempts." />
-            <TextBox Grid.Row="8" Grid.Column="1" Name="TextReconnect" Width="140" HorizontalAlignment="Left" ToolTip.Tip="How long to wait, in milliseconds, between reconnect attempts." />
-
-            <Button Grid.Row="9" Grid.Column="1" Name="ConnectButton" Classes="accent" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" ToolTip.Tip="Connect to (or disconnect from) the server using the details above." />
+            <Button Grid.Row="7" Grid.Column="1" Name="ConnectButton" Classes="accent" Content="Connect" Width="120" HorizontalAlignment="Left" Click="OnConnectClick" ToolTip.Tip="Connect to (or disconnect from) the server using the details above." />
             </Grid>
           </ScrollViewer>
         </DockPanel>
@@ -185,14 +66,11 @@
             <CheckBox Name="CheckPanicSounds" Content="Panic sounds" ToolTip.Tip="Play a sound when the character you are following panics." />
             <CheckBox Name="CheckAlertSounds" Content="Alert sounds" ToolTip.Tip="Play a sound when the character you are following sends an alert." />
             <CheckBox Name="CheckSmartNamePosition" Content="Smart names position" ToolTip.Tip="Automatically reposition names to avoid overlapping." />
-            <CheckBox Name="CheckShowPlacesIcons" Content="Show places icons" ToolTip.Tip="Show icons for notable places on the map." />
-            <CheckBox Name="CheckHideLessImportantPlaces" Content="Hide less important places" ToolTip.Tip="Hide place icons that are considered less important." />
+            <CheckBox Name="CheckHideLessImportantMarkers" Content="Hide less important markers" ToolTip.Tip="Hide marker icons that are considered less important." />
             <CheckBox Name="CheckShowTownsNames" Content="Show towns names" ToolTip.Tip="Show the names of towns on the map." />
-            <CheckBox Name="CheckShowServerBounds" Content="Show server bounds" ToolTip.Tip="Draw the boundary of the server's map area." />
             <CheckBox Name="CheckShowGuardlines" Content="Show guard lines" ToolTip.Tip="Draw the guard lines that separate guard zones." />
             <CheckBox Name="CheckShowCoordinates" Content="Show coordinates" ToolTip.Tip="Show the coordinates of the mouse position." />
             <CheckBox Name="CheckShowHouses" Content="Show houses" ToolTip.Tip="Show houses on the map." />
-            <CheckBox Name="CheckShowMobilesAround" Content="Show mobiles around you" ToolTip.Tip="Show creatures and mobiles near your character." />
             <CheckBox Name="CheckDontRenderUsersDiffFacet" Content="Don't render users on other facets" ToolTip.Tip="Hide users who are on a different facet than you." />
           </WrapPanel>
         </ScrollViewer>
@@ -201,19 +79,11 @@
       <TabItem Header="Application">
         <ScrollViewer>
           <StackPanel Margin="8" Spacing="6">
-            <CheckBox Name="CheckShowScrollbars" Content="Show scrollbars" ToolTip.Tip="Show scrollbars on the map view." />
             <CheckBox Name="CheckOpenChatAtStart" Content="Open chat at start" ToolTip.Tip="Open the chat window automatically when Enhanced Map starts." />
-            <CheckBox Name="CheckShowIncomingMsg" Content="Show incoming messages" ToolTip.Tip="Display messages received from other players." />
-            <CheckBox Name="CheckSoundsIncomingMsg" Content="Sounds on incoming messages" ToolTip.Tip="Play a sound when a new message arrives." />
-            <CheckBox Name="CheckLoadMapsOnDemand" Content="Load maps on demand" ToolTip.Tip="Only load map files when needed to reduce memory usage." />
             <CheckBox Name="CheckShowFps" Content="Show FPS" ToolTip.Tip="Display the current frames per second on screen." />
             <StackPanel Orientation="Horizontal" Spacing="8">
               <TextBlock Text="FPS:" VerticalAlignment="Center" ToolTip.Tip="Target frames per second the map tries to render." />
               <NumericUpDown Name="NumFps" Minimum="1" Maximum="120" Width="120" ToolTip.Tip="Target frames per second the map tries to render." />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-              <TextBlock Text="Chat font size:" VerticalAlignment="Center" ToolTip.Tip="Font size used for text in the chat window." />
-              <NumericUpDown Name="NumChatFontSize" Minimum="6" Maximum="48" Width="120" ToolTip.Tip="Font size used for text in the chat window." />
             </StackPanel>
           </StackPanel>
         </ScrollViewer>

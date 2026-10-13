@@ -33,11 +33,16 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
+      - name: Compute build version
+        id: version
+        shell: bash
+        run: echo "value=$(date -u +%y.%m%d).$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
+
       - name: Publish desktop
-        run: dotnet publish src/EnhancedMap.Desktop/EnhancedMap.Desktop.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/desktop
+        run: dotnet publish src/EnhancedMap.Desktop/EnhancedMap.Desktop.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/desktop -p:Version=${{ steps.version.outputs.value }}
 
       - name: Publish server
-        run: dotnet publish EnhancedMapServerNetCore/EnhancedMapServerNetCore/EnhancedMapServerNetCore.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/server
+        run: dotnet publish EnhancedMapServerNetCore/EnhancedMapServerNetCore/EnhancedMapServerNetCore.csproj -c Release -r ${{ matrix.rid }} --self-contained true -o publish/server -p:Version=${{ steps.version.outputs.value }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -65,6 +70,11 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Compute build version
+        id: version
+        shell: bash
+        run: echo "value=$(date -u +%y.%m%d).$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Package zips
         run: |
@@ -95,6 +105,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
+          BUILD_VERSION: ${{ steps.version.outputs.value }}
         run: |
           cat > notes.md <<'EOF'
           Automated build of the EnhancedMap desktop and server.
@@ -104,9 +115,10 @@ jobs:
           - Linux (x64)
           - macOS (Apple Silicon / arm64)
           EOF
-          printf '\nBuilt from commit `%s`.\n' "$GITHUB_SHA" >> notes.md
+          printf '\nBuild version: `%s`\n' "$BUILD_VERSION" >> notes.md
+          printf 'Built from commit `%s`.\n' "$GITHUB_SHA" >> notes.md
           gh release create latest release/*.zip \
             --target "$GITHUB_SHA" \
-            --title "EnhancedMap Latest" \
+            --title "EnhancedMap $BUILD_VERSION" \
             --latest \
             --notes-file notes.md

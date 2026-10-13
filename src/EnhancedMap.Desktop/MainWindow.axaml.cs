@@ -50,6 +50,11 @@ namespace EnhancedMap.Desktop
             SocketClient.Waiting += (s, e) => SetStatus("Waiting...");
             SocketClient.Disconnected += (s, e) => SetStatus("Offline");
 
+            SocketClient.Connected += (s, e) => Dispatcher.UIThread.Post(UpdateAdminMenu);
+            SocketClient.Waiting += (s, e) => Dispatcher.UIThread.Post(UpdateAdminMenu);
+            SocketClient.Disconnected += (s, e) => Dispatcher.UIThread.Post(UpdateAdminMenu);
+            UpdateAdminMenu();
+
             _timer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(1000.0 / Math.Max(1, Global.SettingsCollection["fps"].ToInt()))};
             _timer.Tick += OnTimerTick;
 
@@ -59,10 +64,12 @@ namespace EnhancedMap.Desktop
 
         public SettingsWindow SettingsWindow { get; }
         public ChatWindow ChatWindow { get; }
-        public PlacesEditorWindow PlacesEditorWindow { get; private set; }
+        public MarkersEditorWindow MarkersEditorWindow { get; private set; }
+        public MarkerManagerWindow MarkerManagerWindow { get; private set; }
         public SearcherWindow SearcherWindow { get; private set; }
         public CoordsConverterWindow CoordsConverterWindow { get; private set; }
         public SharedLabelWindow SharedLabelWindow { get; private set; }
+        public UserManagerWindow UserManagerWindow { get; private set; }
 
         public void SetTimerIntervalByFps(int fps)
         {
@@ -349,11 +356,11 @@ namespace EnhancedMap.Desktop
 
             menu.Items.Add(usersItem);
 
-            var markers = new MenuItem {Header = "Markers"};
+            var pins = new MenuItem {Header = "Pins"};
             var addLocal = new MenuItem {Header = "Add local"};
             addLocal.Click += (s, args) =>
             {
-                RenderObjectsManager.AddMarkerObject(new MarkerObject(null, MouseManager.Location.X, MouseManager.Location.Y));
+                RenderObjectsManager.AddPinObject(new PinObject(null, MouseManager.Location.X, MouseManager.Location.Y));
                 _requestRefresh = true;
             };
             var addShared = new MenuItem {Header = "Add shared"};
@@ -362,21 +369,21 @@ namespace EnhancedMap.Desktop
                 SharedLabelWindow ??= new SharedLabelWindow();
                 SharedLabelWindow.Show(this);
             };
-            markers.Items.Add(addLocal);
-            markers.Items.Add(addShared);
+            pins.Items.Add(addLocal);
+            pins.Items.Add(addShared);
 
-            foreach (MarkerObject mark in RenderObjectsManager.Get<MarkerObject>())
+            foreach (PinObject pin in RenderObjectsManager.Get<PinObject>())
             {
-                var captured = mark;
+                var captured = pin;
                 string owner = captured.Parent?.Name;
-                var m = new MenuItem {Header = string.IsNullOrEmpty(owner) ? $"Marker ({captured.Position.X}, {captured.Position.Y})" : $"{owner}'s marker"};
+                var m = new MenuItem {Header = string.IsNullOrEmpty(owner) ? $"Pin ({captured.Position.X}, {captured.Position.Y})" : $"{owner}'s pin"};
                 var remove = new MenuItem {Header = "Remove"};
                 remove.Click += (s, args) => captured.Dispose();
                 m.Items.Add(remove);
-                markers.Items.Add(m);
+                pins.Items.Add(m);
             }
 
-            menu.Items.Add(markers);
+            menu.Items.Add(pins);
 
             var signals = new MenuItem {Header = "Signals"};
             var alert = new MenuItem {Header = "Send alert"};
@@ -425,13 +432,16 @@ namespace EnhancedMap.Desktop
             menu.Items.Add(maps);
 
             var tools = new MenuItem {Header = "Tools"};
-            var places = new MenuItem {Header = "Places editor"};
-            places.Click += (s, args) => OpenPlacesEditor();
+            var markersEditor = new MenuItem {Header = "Create Marker"};
+            markersEditor.Click += (s, args) => OpenMarkersEditor();
+            var markerManager = new MenuItem {Header = "Marker manager"};
+            markerManager.Click += (s, args) => OpenMarkerManager();
             var search = new MenuItem {Header = "Search..."};
             search.Click += (s, args) => OpenSearch();
             var coords = new MenuItem {Header = "Coords converter"};
             coords.Click += (s, args) => OpenCoordsConverter();
-            tools.Items.Add(places);
+            tools.Items.Add(markersEditor);
+            tools.Items.Add(markerManager);
             tools.Items.Add(search);
             tools.Items.Add(coords);
             menu.Items.Add(tools);
@@ -481,26 +491,38 @@ namespace EnhancedMap.Desktop
             _requestRefresh = true;
         }
 
-        private void OnPlacesEditorClick(object sender, RoutedEventArgs e)
+        private void OnMarkersEditorClick(object sender, RoutedEventArgs e)
         {
-            OpenPlacesEditor();
+            OpenMarkersEditor();
         }
 
-        private void OpenPlacesEditor()
+        private void OpenMarkersEditor()
         {
-            if (PlacesEditorWindow == null)
+            if (MarkersEditorWindow == null)
             {
                 BuildingObject building = RenderObjectsManager.Get<BuildingObject>().LastOrDefault(s => (Global.Facet == s.Entry.Map || (Global.Facet == 0 || Global.Facet == 1) && s.Entry.Map == 7) && s.IsMouseOver);
                 if (building != null)
-                    PlacesEditorWindow = new PlacesEditorWindow(building.Entry);
+                    MarkersEditorWindow = new MarkersEditorWindow(building.Entry);
                 else
                 {
                     HouseObject house = RenderObjectsManager.Get<HouseObject>().LastOrDefault(s => (Global.Facet == s.Entry.Map || (Global.Facet == 0 || Global.Facet == 1) && s.Entry.Map == 7) && s.IsMouseOver);
-                    PlacesEditorWindow = house != null ? new PlacesEditorWindow(house.Entry) : new PlacesEditorWindow();
+                    MarkersEditorWindow = house != null ? new MarkersEditorWindow(house.Entry) : new MarkersEditorWindow();
                 }
             }
 
-            PlacesEditorWindow.Show(this);
+            MarkersEditorWindow.Show(this);
+        }
+
+        private void OnMarkerManagerClick(object sender, RoutedEventArgs e)
+        {
+            OpenMarkerManager();
+        }
+
+        private void OpenMarkerManager()
+        {
+            MarkerManagerWindow ??= new MarkerManagerWindow();
+            MarkerManagerWindow.Reload();
+            MarkerManagerWindow.Show(this);
         }
 
         private void OnSearchClick(object sender, RoutedEventArgs e)
@@ -538,6 +560,23 @@ namespace EnhancedMap.Desktop
             SettingsWindow.ClearConnectionError();
             SettingsWindow.RefreshCenterUsers();
             SettingsWindow.Show(this);
+        }
+
+        private void UpdateAdminMenu()
+        {
+            bool allowed = NetworkManager.SocketClient.IsConnected && NetworkManager.SocketClient.AccessLevel >= AccessLevel.ServerAdmin;
+            UserManagerMenuItem.IsVisible = allowed;
+
+            if (!allowed && UserManagerWindow != null && UserManagerWindow.IsVisible)
+                UserManagerWindow.Hide();
+        }
+
+        private void OnUserManagerClick(object sender, RoutedEventArgs e)
+        {
+            UserManagerWindow ??= new UserManagerWindow();
+            UserManagerWindow.Refresh();
+            UserManagerWindow.Show(this);
+            UserManagerWindow.Activate();
         }
 
         private void OnAboutClick(object sender, RoutedEventArgs e)

@@ -1,61 +1,71 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="EnhancedMap.Desktop.Windows.CoordsConverterWindow"
-        Width="360" Height="240"
+        Width="360" Height="300"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False"
         Title="Coords Converter">
-  <StackPanel Margin="12" Spacing="8">
-    <ComboBox Name="ModeCombo" SelectedIndex="0" HorizontalAlignment="Stretch" SelectionChanged="OnModeChanged">
-      <ComboBoxItem>X, Y &#x2192; move</ComboBoxItem>
-      <ComboBoxItem>Lat, Long &#x2192; move</ComboBoxItem>
-    </ComboBox>
+  <DockPanel Margin="12">
+    <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Width="4" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="Enhanced Map — Coords Converter" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
 
-    <StackPanel Name="XyPanel" Spacing="6">
+    <StackPanel Spacing="8">
+      <ComboBox Name="ModeCombo" SelectedIndex="0" HorizontalAlignment="Stretch" SelectionChanged="OnModeChanged">
+        <ComboBoxItem>X, Y &#x2192; move</ComboBoxItem>
+        <ComboBoxItem>Lat, Long &#x2192; move</ComboBoxItem>
+      </ComboBox>
+
+      <StackPanel Name="XyPanel" Spacing="6">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="X:" VerticalAlignment="Center" Width="40" />
+          <TextBox Name="TextBoxX" Text="0" Width="100" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="Y:" VerticalAlignment="Center" Width="40" />
+          <TextBox Name="TextBoxY" Text="0" Width="100" />
+        </StackPanel>
+      </StackPanel>
+
+      <StackPanel Name="LatLongPanel" Spacing="6" IsVisible="False">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="Lat:" VerticalAlignment="Center" Width="40" />
+          <TextBox Name="DegLat" Text="0" Width="60" />
+          <TextBlock Text="&#xB0;" VerticalAlignment="Center" />
+          <TextBox Name="MinLat" Text="0" Width="60" />
+          <TextBlock Text="'" VerticalAlignment="Center" />
+          <ComboBox Name="LatDir" SelectedIndex="0" Width="60">
+            <ComboBoxItem>N</ComboBoxItem>
+            <ComboBoxItem>S</ComboBoxItem>
+          </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="Long:" VerticalAlignment="Center" Width="40" />
+          <TextBox Name="DegLong" Text="0" Width="60" />
+          <TextBlock Text="&#xB0;" VerticalAlignment="Center" />
+          <TextBox Name="MinLong" Text="0" Width="60" />
+          <TextBlock Text="'" VerticalAlignment="Center" />
+          <ComboBox Name="LongDir" SelectedIndex="0" Width="60">
+            <ComboBoxItem>W</ComboBoxItem>
+            <ComboBoxItem>E</ComboBoxItem>
+          </ComboBox>
+        </StackPanel>
+      </StackPanel>
+
       <StackPanel Orientation="Horizontal" Spacing="6">
-        <TextBlock Text="X:" VerticalAlignment="Center" Width="40" />
-        <TextBox Name="TextBoxX" Text="0" Width="100" />
+        <TextBlock Text="Map:" VerticalAlignment="Center" Width="40" />
+        <ComboBox Name="MapCombo" Width="80" />
       </StackPanel>
-      <StackPanel Orientation="Horizontal" Spacing="6">
-        <TextBlock Text="Y:" VerticalAlignment="Center" Width="40" />
-        <TextBox Name="TextBoxY" Text="0" Width="100" />
-      </StackPanel>
-    </StackPanel>
 
-    <StackPanel Name="LatLongPanel" Spacing="6" IsVisible="False">
-      <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="Lat:" VerticalAlignment="Center" Width="40" />
-        <TextBox Name="DegLat" Text="0" Width="60" />
-        <TextBlock Text="&#xB0;" VerticalAlignment="Center" />
-        <TextBox Name="MinLat" Text="0" Width="60" />
-        <TextBlock Text="'" VerticalAlignment="Center" />
-        <ComboBox Name="LatDir" SelectedIndex="0" Width="60">
-          <ComboBoxItem>N</ComboBoxItem>
-          <ComboBoxItem>S</ComboBoxItem>
-        </ComboBox>
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="Long:" VerticalAlignment="Center" Width="40" />
-        <TextBox Name="DegLong" Text="0" Width="60" />
-        <TextBlock Text="&#xB0;" VerticalAlignment="Center" />
-        <TextBox Name="MinLong" Text="0" Width="60" />
-        <TextBlock Text="'" VerticalAlignment="Center" />
-        <ComboBox Name="LongDir" SelectedIndex="0" Width="60">
-          <ComboBoxItem>W</ComboBoxItem>
-          <ComboBoxItem>E</ComboBoxItem>
-        </ComboBox>
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Name="GoButton" Content="Go" Width="80" Click="OnGoClick" />
+        <Button Name="ResetButton" Content="Reset" Width="80" Click="OnResetClick" />
       </StackPanel>
     </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="6">
-      <TextBlock Text="Map:" VerticalAlignment="Center" Width="40" />
-      <ComboBox Name="MapCombo" Width="80" />
-    </StackPanel>
-
-    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-      <Button Name="GoButton" Content="Go" Width="80" Click="OnGoClick" />
-      <Button Name="ResetButton" Content="Reset" Width="80" Click="OnResetClick" />
-    </StackPanel>
-  </StackPanel>
+  </DockPanel>
 </Window>

@@ -17,6 +17,7 @@ namespace EnhancedMap.Desktop.Windows
         public MessageDialog(string title, bool ignorable, string message) : this()
         {
             Title = title;
+            HeaderText.Text = title;
             MessageBox.Text = message;
             if (ignorable)
                 OkayButton.Content = "Ignore";

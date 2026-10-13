@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="EnhancedMap.Desktop.Windows.MarkerManagerWindow"
+        Width="820" Height="560"
+        MinWidth="620" MinHeight="380"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Title="Marker Manager">
+  <DockPanel Margin="12">
+    <Border DockPanel.Dock="Top" Padding="12,8" Margin="0,0,0,10" CornerRadius="8"
+            Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+      <StackPanel Orientation="Horizontal" Spacing="10">
+        <Border Width="4" Height="18" CornerRadius="2" Background="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+        <TextBlock Text="Enhanced Map — Marker Manager" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+      </StackPanel>
+    </Border>
+
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,10,0,0">
+      <Button Name="SaveButton" Classes="accent" Content="Save" Width="90" Click="OnSaveClick" />
+      <Button Content="Close" Width="90" Click="OnCloseClick" />
+    </StackPanel>
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,300" ColumnSpacing="10" RowSpacing="10">
+      <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+        <Button Name="NewButton" Content="New" Width="80" Click="OnNewClick" />
+        <Button Name="RemoveButton" Content="Remove" Width="80" Click="OnRemoveClick" />
+        <Border Width="1" Height="22" Background="{DynamicResource FieldBorderBrush}" VerticalAlignment="Center" Margin="4,0" />
+        <TextBlock Text="Category:" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" />
+        <ComboBox Name="FilterCombo" Width="150" SelectionChanged="OnFilterChanged" />
+        <TextBox Name="SearchBox" Width="170" Watermark="Search..." TextChanged="OnSearchChanged" />
+      </StackPanel>
+
+      <Border Grid.Row="1" Grid.Column="0" CornerRadius="8"
+              Background="{DynamicResource FieldBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1">
+        <ListBox Name="MarkerList" SelectionChanged="OnSelectionChanged" />
+      </Border>
+
+      <Border Grid.Row="1" Grid.Column="1" CornerRadius="8"
+              Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource FieldBorderBrush}" BorderThickness="1" Padding="12">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+          <StackPanel Spacing="8">
+            <TextBlock Name="FormTitle" Text="New marker" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="X:" Width="40" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" />
+              <TextBox Name="TextX" Width="90" />
+              <TextBlock Text="Y:" Width="16" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" />
+              <TextBox Name="TextY" Width="90" />
+            </StackPanel>
+            <TextBlock Text="Description:" Foreground="{DynamicResource MutedTextBrush}" />
+            <TextBox Name="DescriptionBox" AcceptsReturn="True" Height="70" TextWrapping="Wrap" />
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Category:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" />
+              <ComboBox Name="CategoryCombo" Width="170" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Facet:" Width="70" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" />
+              <ComboBox Name="FacetCombo" Width="170" />
+            </StackPanel>
+            <CheckBox Name="ShowNameCheck" Content="Always show name" />
+            <Button Name="ApplyButton" Classes="accent" Content="Add" Width="90" HorizontalAlignment="Right" Click="OnApplyClick" />
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </DockPanel>
+</Window>

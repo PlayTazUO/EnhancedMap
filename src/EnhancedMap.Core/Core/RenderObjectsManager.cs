@@ -81,7 +81,7 @@ namespace EnhancedMap.Core
             _objects[(int) LAYER_ORDER.OTHERS].Add(obj);
         }
 
-        public static void AddMarkerObject(MarkerObject obj)
+        public static void AddPinObject(PinObject obj)
         {
             _objects[(int) LAYER_ORDER.OTHERS].Add(obj);
         }
@@ -147,7 +147,7 @@ namespace EnhancedMap.Core
             _objects[(int) LAYER_ORDER.OTHERS].Remove(obj);
         }
 
-        public static void RemoveMarkerObject(MarkerObject obj)
+        public static void RemovePinObject(PinObject obj)
         {
             _objects[(int) LAYER_ORDER.OTHERS].Remove(obj);
         }
@@ -198,7 +198,7 @@ namespace EnhancedMap.Core
                 return _objects[(int) LAYER_ORDER.HOUSES].Where(s => s is T).Cast<T>().ToArray();
             if (typeof(T) == typeof(LabelObject))
                 return _objects[(int) LAYER_ORDER.LABELS].Where(s => s is T).Cast<T>().ToArray();
-            if (typeof(T) == typeof(DeathObject) || typeof(T) == typeof(MarkerObject))
+            if (typeof(T) == typeof(DeathObject) || typeof(T) == typeof(PinObject))
                 return _objects[(int) LAYER_ORDER.OTHERS].Where(s => s is T).Cast<T>().ToArray();
             if (typeof(T) == typeof(SignalObject))
                 return _objects[(int) LAYER_ORDER.SIGNALS].Where(s => s is T).Cast<T>().ToArray();

@@ -9,8 +9,6 @@
     <Copyright>EnhancedMapServer @2018</Copyright>
     <AssemblyName>EnhancedMapServer</AssemblyName>
     <RootNamespace>EnhancedMapServerNetCore</RootNamespace>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
-    <Version>1.0.4</Version>
   </PropertyGroup>
 
 </Project>

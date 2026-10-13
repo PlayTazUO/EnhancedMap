@@ -21,12 +21,14 @@
         <MenuItem Header="Zoom _out" Click="OnZoomOutClick" />
       </MenuItem>
       <MenuItem Header="_Tools">
-        <MenuItem Header="_Places editor" Click="OnPlacesEditorClick" />
+        <MenuItem Header="Create _Marker" Click="OnMarkersEditorClick" />
+        <MenuItem Header="_Marker manager" Click="OnMarkerManagerClick" />
         <MenuItem Header="_Search..." Click="OnSearchClick" />
         <MenuItem Header="_Coords converter" Click="OnCoordsConverterClick" />
       </MenuItem>
       <MenuItem Header="_Settings" Click="OnSettingsClick" />
       <MenuItem Header="_Chat" Click="OnChatClick" />
+      <MenuItem Header="User _Manager" Name="UserManagerMenuItem" IsVisible="False" Click="OnUserManagerClick" />
       <MenuItem Header="_Help">
         <MenuItem Header="_About" Click="OnAboutClick" />
       </MenuItem>

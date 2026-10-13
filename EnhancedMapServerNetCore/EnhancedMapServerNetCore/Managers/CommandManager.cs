@@ -30,6 +30,8 @@ namespace EnhancedMapServerNetCore.Managers
             { "enableuser", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.ROOM_ADMIN, EnableUser)},
             { "allusersinroom", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.ROOM_ADMIN, AllUsersInRoom)},
             { "allusers", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, AllUsers)},
+            { "listusers", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.ROOM_ADMIN, ListUsers)},
+            { "listrooms", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, ListRooms)},
             { "statistics", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, Statistics)},
             { "setprivileges", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, SetPrivileges)},
             { "setloginsys", new Tuple<ACCOUNT_LEVEL, Action<User, string[]>>(ACCOUNT_LEVEL.SERVER_ADMIN, SetLoginSystem)},
@@ -560,6 +562,41 @@ namespace EnhancedMapServerNetCore.Managers
             var list = AccountManager.Accounts.ToList();
             foreach (var s in list)
                 SendTo(user, string.Format("|{0,24}|{1,24}|{2,24}|", s.Name, s.Room.Name, s.AccountLevel), true);
+        }
+
+        /// <summary>
+        ///     Sends a machine-readable list of accounts. Each account is a single line in the
+        ///     form <c>LSTUSR|name|room|level|banned|online</c>, terminated by <c>LSTUSR_END</c>.
+        ///     Room admins only receive the accounts of their own room.
+        /// </summary>
+        private static void ListUsers(User user, params string[] args)
+        {
+            bool serverAdmin = user == null || user.Account.AccountLevel >= ACCOUNT_LEVEL.SERVER_ADMIN;
+            string myRoom = user?.Account?.Room?.Name;
+
+            foreach (Account account in AccountManager.Accounts)
+            {
+                if (!serverAdmin && (account.Room == null || account.Room.Name != myRoom))
+                    continue;
+
+                string room = account.Room != null ? account.Room.Name : string.Empty;
+                User online = UserManager.Get(account.Name);
+                SendTo(user, $"LSTUSR|{account.Name}|{room}|{(int) account.AccountLevel}|{account.IsBanned}|{online != null}");
+            }
+
+            SendTo(user, "LSTUSR_END");
+        }
+
+        /// <summary>
+        ///     Sends a machine-readable list of rooms. Each room is a single line in the form
+        ///     <c>LSTROM|name</c>, terminated by <c>LSTROM_END</c>.
+        /// </summary>
+        private static void ListRooms(User user, params string[] args)
+        {
+            foreach (Room room in RoomManager.Rooms)
+                SendTo(user, $"LSTROM|{room.Name}");
+
+            SendTo(user, "LSTROM_END");
         }
 
         private static void Statistics(User user, params string[] args)

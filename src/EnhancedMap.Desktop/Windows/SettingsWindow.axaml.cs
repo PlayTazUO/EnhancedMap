@@ -110,8 +110,6 @@ namespace EnhancedMap.Desktop.Windows
                     Set(TextPort, network, "port");
                     CheckRememberServer.IsChecked = GetBool(network, "rememberserver");
                     CheckAutoLogin.IsChecked = GetBool(network, "autologin");
-                    CheckTryReconnect.IsChecked = GetBool(network, "tryreconnect");
-                    TextReconnect.Text = GetInt(network, "tryreconnecttime").ToString();
                 }
 
                 XmlElement general = root["general"];
@@ -127,14 +125,11 @@ namespace EnhancedMap.Desktop.Windows
                     CheckPanicSounds.IsChecked = GetBool(general, "panicsounds");
                     CheckAlertSounds.IsChecked = GetBool(general, "alertsounds");
                     CheckSmartNamePosition.IsChecked = GetBool(general, "smartnamesposition");
-                    CheckShowPlacesIcons.IsChecked = GetBool(general, "showplacesicons");
-                    CheckHideLessImportantPlaces.IsChecked = GetBool(general, "hidelessimportantplaces");
+                    CheckHideLessImportantMarkers.IsChecked = GetBool(general, "hidelessimportantplaces");
                     CheckShowTownsNames.IsChecked = GetBool(general, "showtownsnames");
-                    CheckShowServerBounds.IsChecked = GetBool(general, "showserverbounds");
                     CheckShowGuardlines.IsChecked = GetBool(general, "showguardlines");
                     CheckShowCoordinates.IsChecked = GetBool(general, "showcoordinates");
                     CheckShowHouses.IsChecked = GetBool(general, "showhouses");
-                    CheckShowMobilesAround.IsChecked = GetBool(general, "showmobilesaroundyou");
                     CheckDontRenderUsersDiffFacet.IsChecked = GetBool(general, "dontrenderusersindifferentfacets");
                     Global.SettingsCollection["centeruser"] = general.ToText("centeruser", Global.SettingsCollection["centeruser"].ToString());
                 }
@@ -142,16 +137,10 @@ namespace EnhancedMap.Desktop.Windows
                 XmlElement application = root["application"];
                 if (application != null)
                 {
-                    CheckShowScrollbars.IsChecked = GetBool(application, "showscrollbarls");
                     CheckOpenChatAtStart.IsChecked = GetBool(application, "openchatatstart");
-                    CheckShowIncomingMsg.IsChecked = GetBool(application, "showincomingmsg");
-                    CheckSoundsIncomingMsg.IsChecked = GetBool(application, "soundsincomingmsg");
-                    CheckLoadMapsOnDemand.IsChecked = GetBool(application, "loadmapsondemand");
                     CheckShowFps.IsChecked = GetBool(application, "showfps");
                     decimal fps = GetInt(application, "fps");
                     NumFps.Value = fps < 1 ? 30 : fps;
-                    decimal cf = GetInt(application, "chatfontsize");
-                    NumChatFontSize.Value = cf < 6 ? 10 : cf;
                 }
 
                 XmlElement diagnostic = root["diagnostic"];
@@ -229,8 +218,6 @@ namespace EnhancedMap.Desktop.Windows
             TextPort.Text = s["port"].ToString();
             CheckRememberServer.IsChecked = s["rememberserver"].ToBool();
             CheckAutoLogin.IsChecked = s["autologin"].ToBool();
-            CheckTryReconnect.IsChecked = s["tryreconnect"].ToBool();
-            TextReconnect.Text = s["tryreconnecttime"].ToInt().ToString();
 
             CheckShowHits.IsChecked = s["showhits"].ToBool();
             CheckShowStamina.IsChecked = s["showstamina"].ToBool();
@@ -242,24 +229,16 @@ namespace EnhancedMap.Desktop.Windows
             CheckPanicSounds.IsChecked = s["panicsounds"].ToBool();
             CheckAlertSounds.IsChecked = s["alertsounds"].ToBool();
             CheckSmartNamePosition.IsChecked = s["smartnamesposition"].ToBool();
-            CheckShowPlacesIcons.IsChecked = s["showplacesicons"].ToBool();
-            CheckHideLessImportantPlaces.IsChecked = s["hidelessimportantplaces"].ToBool();
+            CheckHideLessImportantMarkers.IsChecked = s["hidelessimportantplaces"].ToBool();
             CheckShowTownsNames.IsChecked = s["showtownsnames"].ToBool();
-            CheckShowServerBounds.IsChecked = s["showserverbounds"].ToBool();
             CheckShowGuardlines.IsChecked = s["showguardlines"].ToBool();
             CheckShowCoordinates.IsChecked = s["showcoordinates"].ToBool();
             CheckShowHouses.IsChecked = s["showhouses"].ToBool();
-            CheckShowMobilesAround.IsChecked = s["showmobilesaroundyou"].ToBool();
             CheckDontRenderUsersDiffFacet.IsChecked = s["dontrenderusersindifferentfacets"].ToBool();
 
-            CheckShowScrollbars.IsChecked = s["showscrollbarls"].ToBool();
             CheckOpenChatAtStart.IsChecked = s["openchatatstart"].ToBool();
-            CheckShowIncomingMsg.IsChecked = s["showincomingmsg"].ToBool();
-            CheckSoundsIncomingMsg.IsChecked = s["soundsincomingmsg"].ToBool();
-            CheckLoadMapsOnDemand.IsChecked = s["loadmapsondemand"].ToBool();
             CheckShowFps.IsChecked = s["showfps"].ToBool();
             NumFps.Value = s["fps"].ToInt();
-            NumChatFontSize.Value = s["chatfontsize"].ToInt();
             CheckAutoScroll.IsChecked = s["autoscroll"].ToBool();
         }
 
@@ -283,8 +262,6 @@ namespace EnhancedMap.Desktop.Windows
                 xml.WriteAttributeString("port", TextPort.Text ?? string.Empty);
                 xml.WriteAttributeString("rememberserver", (CheckRememberServer.IsChecked == true).ToString());
                 xml.WriteAttributeString("autologin", (CheckAutoLogin.IsChecked == true).ToString());
-                xml.WriteAttributeString("tryreconnect", (CheckTryReconnect.IsChecked == true).ToString());
-                xml.WriteAttributeString("tryreconnecttime", ReconnectDelay().ToString());
                 xml.WriteEndElement();
 
                 xml.WriteStartElement("general");
@@ -299,26 +276,18 @@ namespace EnhancedMap.Desktop.Windows
                 WriteCheck(xml, "panicsounds", CheckPanicSounds);
                 WriteCheck(xml, "alertsounds", CheckAlertSounds);
                 WriteCheck(xml, "smartnamesposition", CheckSmartNamePosition);
-                WriteCheck(xml, "showplacesicons", CheckShowPlacesIcons);
-                WriteCheck(xml, "hidelessimportantplaces", CheckHideLessImportantPlaces);
+                WriteCheck(xml, "hidelessimportantplaces", CheckHideLessImportantMarkers);
                 WriteCheck(xml, "showtownsnames", CheckShowTownsNames);
-                WriteCheck(xml, "showserverbounds", CheckShowServerBounds);
                 WriteCheck(xml, "showguardlines", CheckShowGuardlines);
                 WriteCheck(xml, "showcoordinates", CheckShowCoordinates);
                 WriteCheck(xml, "showhouses", CheckShowHouses);
-                WriteCheck(xml, "showmobilesaroundyou", CheckShowMobilesAround);
                 WriteCheck(xml, "dontrenderusersindifferentfacets", CheckDontRenderUsersDiffFacet);
                 xml.WriteEndElement();
 
                 xml.WriteStartElement("application");
-                WriteCheck(xml, "showscrollbarls", CheckShowScrollbars);
                 WriteCheck(xml, "openchatatstart", CheckOpenChatAtStart);
-                WriteCheck(xml, "showincomingmsg", CheckShowIncomingMsg);
-                WriteCheck(xml, "soundsincomingmsg", CheckSoundsIncomingMsg);
-                WriteCheck(xml, "loadmapsondemand", CheckLoadMapsOnDemand);
                 WriteCheck(xml, "showfps", CheckShowFps);
                 xml.WriteAttributeString("fps", ((int) (NumFps.Value ?? 30)).ToString());
-                xml.WriteAttributeString("chatfontsize", ((int) (NumChatFontSize.Value ?? 10)).ToString());
                 xml.WriteEndElement();
 
                 xml.WriteStartElement("diagnostic");
@@ -342,8 +311,6 @@ namespace EnhancedMap.Desktop.Windows
             s["port"] = TextPort.Text ?? "8887";
             s["rememberserver"] = CheckRememberServer.IsChecked == true;
             s["autologin"] = CheckAutoLogin.IsChecked == true;
-            s["tryreconnect"] = CheckTryReconnect.IsChecked == true;
-            s["tryreconnecttime"] = ReconnectDelay();
 
             s["showhits"] = CheckShowHits.IsChecked == true;
             s["showstamina"] = CheckShowStamina.IsChecked == true;
@@ -355,30 +322,17 @@ namespace EnhancedMap.Desktop.Windows
             s["panicsounds"] = CheckPanicSounds.IsChecked == true;
             s["alertsounds"] = CheckAlertSounds.IsChecked == true;
             s["smartnamesposition"] = CheckSmartNamePosition.IsChecked == true;
-            s["showplacesicons"] = CheckShowPlacesIcons.IsChecked == true;
-            s["hidelessimportantplaces"] = CheckHideLessImportantPlaces.IsChecked == true;
+            s["hidelessimportantplaces"] = CheckHideLessImportantMarkers.IsChecked == true;
             s["showtownsnames"] = CheckShowTownsNames.IsChecked == true;
-            s["showserverbounds"] = CheckShowServerBounds.IsChecked == true;
             s["showguardlines"] = CheckShowGuardlines.IsChecked == true;
             s["showcoordinates"] = CheckShowCoordinates.IsChecked == true;
             s["showhouses"] = CheckShowHouses.IsChecked == true;
-            s["showmobilesaroundyou"] = CheckShowMobilesAround.IsChecked == true;
             s["dontrenderusersindifferentfacets"] = CheckDontRenderUsersDiffFacet.IsChecked == true;
 
-            s["showscrollbarls"] = CheckShowScrollbars.IsChecked == true;
             s["openchatatstart"] = CheckOpenChatAtStart.IsChecked == true;
-            s["showincomingmsg"] = CheckShowIncomingMsg.IsChecked == true;
-            s["soundsincomingmsg"] = CheckSoundsIncomingMsg.IsChecked == true;
-            s["loadmapsondemand"] = CheckLoadMapsOnDemand.IsChecked == true;
             s["showfps"] = CheckShowFps.IsChecked == true;
             s["fps"] = (int) (NumFps.Value ?? 30);
-            s["chatfontsize"] = (int) (NumChatFontSize.Value ?? 10);
             s["autoscroll"] = CheckAutoScroll.IsChecked == true;
-        }
-
-        private int ReconnectDelay()
-        {
-            return int.TryParse(TextReconnect.Text, out int value) && value > 0 ? value : 30000;
         }
 
         private static void WriteCheck(XmlWriter xml, string name, CheckBox box)
@@ -678,6 +632,12 @@ namespace EnhancedMap.Desktop.Windows
                 Description = "List every registered account.",
                 Usage = "allusers"
             },
+            new ServerCommand
+            {
+                Name = "listusers", Category = "Users", Required = AccessLevel.RoomAdmin,
+                Description = "Machine-readable account list used by the User Manager.",
+                Usage = "listusers"
+            },
 
             // ---- Rooms
             new ServerCommand
@@ -721,6 +681,12 @@ namespace EnhancedMap.Desktop.Windows
                 Name = "allrooms", Category = "Rooms", Required = AccessLevel.ServerAdmin,
                 Description = "List all rooms and their user counts.",
                 Usage = "allrooms"
+            },
+            new ServerCommand
+            {
+                Name = "listrooms", Category = "Rooms", Required = AccessLevel.ServerAdmin,
+                Description = "Machine-readable room list used by the User Manager.",
+                Usage = "listrooms"
             },
             new ServerCommand
             {

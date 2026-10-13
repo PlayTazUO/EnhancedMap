@@ -6,9 +6,9 @@ using EnhancedMap.Core.MapObjects;
 
 namespace EnhancedMap.Desktop.Windows
 {
-    public partial class PlacesEditorWindow : Window
+    public partial class MarkersEditorWindow : Window
     {
-        public PlacesEditorWindow()
+        public MarkersEditorWindow()
         {
             InitializeComponent();
 
@@ -32,7 +32,7 @@ namespace EnhancedMap.Desktop.Windows
             };
         }
 
-        public PlacesEditorWindow(HouseEntry entry) : this()
+        public MarkersEditorWindow(HouseEntry entry) : this()
         {
             DescriptionBox.Text = entry.Description;
             TextX.Text = entry.Location.X.ToString();
@@ -43,7 +43,7 @@ namespace EnhancedMap.Desktop.Windows
             AddButton.Tag = entry;
         }
 
-        public PlacesEditorWindow(BuildingEntry entry) : this()
+        public MarkersEditorWindow(BuildingEntry entry) : this()
         {
             DescriptionBox.Text = entry.Description;
             TextX.Text = entry.Location.X.ToString();

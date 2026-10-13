@@ -3,13 +3,13 @@ using EnhancedMap.Properties;
 
 namespace EnhancedMap.Core.MapObjects
 {
-    public class MarkerObject : RenderObject
+    public class PinObject : RenderObject
     {
         private static readonly Pen _pen = new Pen(Color.White) {DashStyle = DashStyle.Dot, DashPattern = new float[] {9, 4, 3, 4, 3, 4}};
 
         private readonly Image _img;
 
-        public MarkerObject(UserObject parent, int x, int y) : base("marker")
+        public PinObject(UserObject parent, int x, int y) : base("pin")
         {
             Parent = parent;
             UpdatePosition(x, y);
@@ -40,7 +40,7 @@ namespace EnhancedMap.Core.MapObjects
             relativeY = gameY + y;
 
 
-            // With no local player the marker's line points at the view center (the reference point).
+            // With no local player the pin's line points at the view center (the reference point).
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.DrawLine(_pen, relativeX, relativeY, x, y);
             g.ResetTransform();
